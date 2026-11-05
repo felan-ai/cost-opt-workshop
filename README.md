@@ -13,6 +13,7 @@ Participants implement the same feature twice in the Storzy application: first w
 | Path | Purpose |
 |---|---|
 | `app/`, `components/`, `lib/` | Storzy application used for the coding exercise |
+| `materials/pre-workshop-checklist.md` | Setup and readiness checks to complete before the event |
 | `materials/implementation-task.md` | Exact feature prompt used for both runs |
 | `materials/manual-verification.md` | Six-check manual validation checklist |
 | `.agents/skills/cost-statistics/` | Cost and quality evaluation skill for Felan and Codex |
@@ -28,6 +29,8 @@ The starting application intentionally does not contain the workshop's product-s
 - A coding agent such as Felan, Claude Code, or Codex
 
 ## Setup
+
+Complete the [`pre-workshop checklist`](materials/pre-workshop-checklist.md) before the event. The abbreviated setup is below.
 
 After cloning the repository:
 
