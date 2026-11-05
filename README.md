@@ -14,6 +14,7 @@ Participants implement the same feature twice in the Storzy application: first w
 |---|---|
 | `app/`, `components/`, `lib/` | Storzy application used for the coding exercise |
 | `materials/pre-workshop-checklist.md` | Setup and readiness checks to complete before the event |
+| `materials/felan-workshop-flow.md` | Step-by-step Felan baseline and enhanced workflow |
 | `materials/implementation-task.md` | Exact feature prompt used for both runs |
 | `materials/manual-verification.md` | Six-check manual validation checklist |
 | `.agents/skills/cost-statistics/` | Cost and quality evaluation skill for Felan and Codex |
