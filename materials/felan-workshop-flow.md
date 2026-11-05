@@ -28,10 +28,11 @@ For the workshop baseline used with Felan:
 
 After changing the configuration, exit any existing Felan session. Start the baseline session only after creating the baseline worktree below.
 
-## 2. Open the prepared baseline worktree
+## 2. Start the baseline agent session
 
-The baseline and enhanced worktrees should already exist from the pre-workshop setup. Enter the baseline worktree before starting the implementation session:
+The baseline and enhanced worktrees should already exist from the pre-workshop setup. Start a fresh Felan session from the baseline worktree:
 
 ```bash
 cd path/to/cost-opt-workshop-baseline
+felan
 ```
