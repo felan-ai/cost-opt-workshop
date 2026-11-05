@@ -37,6 +37,14 @@ Complete these steps before the workshop. Do not start the implementation task y
   pnpm test
   ```
 
+- [ ] Run ESLint and confirm it completes successfully:
+
+  ```bash
+  pnpm lint
+  ```
+
+  ESLint must be provided by the repository dependencies; a global installation should not be required. If the command reports that ESLint is missing, contact the facilitator rather than changing the workshop dependencies locally.
+
 - [ ] Run the production build and confirm it succeeds:
 
   ```bash
