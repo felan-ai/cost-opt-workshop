@@ -42,3 +42,31 @@ felan
 Copy the complete contents of [`implementation-task.md`](implementation-task.md) and paste them into the fresh Felan session as the first user prompt.
 
 Submit the prompt unchanged. Do not add implementation hints, acceptance criteria, workshop context, or instructions about cost measurement. The same prompt must be used for both the baseline and enhanced runs.
+
+## 4. Analyze the baseline implementation
+
+Wait for the baseline agent to finish its implementation, review, corrections, and verification. Record the root implementation session ID, then exit the implementation session.
+
+Use a fixed non-frontier evaluator configuration for both the baseline report and final comparison:
+
+```json
+{
+  "defaultModel": "gpt-6.1-sol",
+  "defaultThinkingLevel": "medium"
+}
+```
+
+Start a fresh evaluator session from the original control repository, not from either implementation worktree:
+
+```bash
+cd path/to/cost-opt-workshop
+felan
+```
+
+Submit:
+
+```text
+Use the cost-statistics skill to create a baseline report for session <BASELINE_SESSION_ID>.
+```
+
+The evaluator reads the implementation session and its descendants, inspects the baseline worktree, and saves the report under `workshop-results/` in the control repository. The evaluator session's usage is workshop overhead and must not be included in the implementation statistics.
