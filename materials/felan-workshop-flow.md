@@ -36,3 +36,9 @@ The baseline and enhanced worktrees should already exist from the pre-workshop s
 cd path/to/cost-opt-workshop-baseline
 felan
 ```
+
+## 3. Submit the implementation task
+
+Copy the complete contents of [`implementation-task.md`](implementation-task.md) and paste them into the fresh Felan session as the first user prompt.
+
+Submit the prompt unchanged. Do not add implementation hints, acceptance criteria, workshop context, or instructions about cost measurement. The same prompt must be used for both the baseline and enhanced runs.
