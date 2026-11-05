@@ -22,7 +22,7 @@ For the workshop baseline used with Felan:
 ```json
 {
   "defaultModel": "gpt-6-astra",
-  "defaultThinkingLevel": "medium"
+  "defaultThinkingLevel": "high"
 }
 ```
 
