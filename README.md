@@ -1,100 +1,132 @@
-# Storzy
+# AI Coding Cost Optimization Workshop
 
-A Next.js 16 e-commerce demo application built with React 19, shadcn/ui, and Tailwind CSS.
+This repository is the hands-on playground for the [Get More from Your AI Coding Budget](https://ai-sdlc.services/#agenda) workshop.
+
+**When:** Thursday, November 12, 2026, 17:00–20:00 Europe/Sofia (EET, UTC+2)
+
+**Format:** Three-hour online workshop
+
+Participants implement the same feature twice in the Storzy application: first with a minimal coding-agent setup, then with cost-optimization techniques enabled. The two runs are evaluated using observed cost, time, token usage, verification evidence, and a shared quality rubric.
+
+## Repository contents
+
+| Path | Purpose |
+|---|---|
+| `app/`, `components/`, `lib/` | Storzy application used for the coding exercise |
+| `materials/implementation-task.md` | Exact feature prompt used for both runs |
+| `materials/manual-verification.md` | Six-check manual validation checklist |
+| `.agents/skills/cost-statistics/` | Cost and quality evaluation skill for Felan and Codex |
+| `.claude/skills/cost-statistics/` | Equivalent skill for Claude Code |
+| `workshop-results/` | Locally generated reports; created when needed and ignored by Git |
+
+The starting application intentionally does not contain the workshop's product-search feature.
 
 ## Prerequisites
 
 - Node.js 20.9.0 or later
 - pnpm
+- A coding agent such as Felan, Claude Code, or Codex
 
 ## Setup
 
-1. Clone the repository:
-   ```bash
-   git clone git@github.com:bugzy-ai/storzy.git
-   cd storzy
-   ```
+After cloning the repository:
 
-2. Install dependencies:
-   ```bash
-   pnpm install
-   ```
+```bash
+cd cost-opt-workshop
+pnpm install
+cp .env.local.example .env.local
+pnpm test
+```
 
-3. Create environment file:
-   ```bash
-   cp .env.local.example .env.local
-   ```
-   Or create `.env.local` manually (see Environment Variables below).
+Start the application:
 
-## Environment Variables
+```bash
+pnpm dev
+```
 
-Create a `.env.local` file in the project root with the following variables:
+Open [http://localhost:3000](http://localhost:3000) and log in with:
+
+```text
+Username: test_user
+Password: password
+```
+
+## Workshop flow
+
+### 1. Baseline implementation
+
+1. Start a fresh coding-agent session with the workshop's baseline configuration.
+2. Submit the prompt from [`materials/implementation-task.md`](materials/implementation-task.md) without changing it.
+3. Wait for the root agent, implementation subagents, reviewers, corrections, and verification to finish.
+4. Record the implementation session ID.
+
+### 2. Baseline evaluation
+
+Start a separate evaluator session and ask:
+
+```text
+Use the cost-statistics skill to create a baseline report for session <BASELINE_SESSION_ID>.
+```
+
+The report is saved under `workshop-results/`. The evaluator session is not part of the implementation cost.
+
+### 3. Enhanced implementation
+
+1. Return to a clean copy or worktree of the original starting state.
+2. Enable the optimization techniques introduced during the workshop.
+3. Submit the exact same implementation prompt in a fresh session.
+4. Record the enhanced implementation session ID.
+
+### 4. Final comparison
+
+Start another evaluator session and ask:
+
+```text
+Use the cost-statistics skill to analyze enhanced session <ENHANCED_SESSION_ID> and compare it with the saved baseline report.
+```
+
+The final report compares observed statistics and workshop quality scores. It does not include estimated Prewalk or RTK savings and does not declare a single overall winner.
+
+### 5. Manual verification
+
+Run the six checks in [`materials/manual-verification.md`](materials/manual-verification.md) and record the result separately from the LLM-applied quality score.
+
+## Skill discovery
+
+The repository includes real copies of the same `cost-statistics` skill in both supported project locations:
+
+- Felan and Codex: `.agents/skills/cost-statistics/SKILL.md`
+- Claude Code: `.claude/skills/cost-statistics/SKILL.md`
+
+Start a fresh agent session after cloning so the skill is discovered. If automatic discovery is unavailable, explicitly ask the agent to read the appropriate `SKILL.md` file.
+
+## Verification commands
+
+```bash
+pnpm test
+pnpm exec tsc --noEmit
+pnpm lint
+pnpm build
+```
+
+The prepared starting state has 21 automated tests. A production build should complete successfully before beginning the exercise.
+
+## Environment variables
+
+The default values in `.env.local.example` are suitable for the workshop:
 
 ```env
 NEXT_PUBLIC_IMPROVED_CHECKOUT=false
 NEXT_PUBLIC_ADD_TO_CART_BUG=false
-
-# Server-side checkout provider rollout
 CHECKOUT_PROVIDER_V2=false
-
-# Optional server-side PostHog Logs delivery (EU)
 POSTHOG_PROJECT_TOKEN=
 POSTHOG_LOGS_ENDPOINT=https://eu.i.posthog.com/i/v1/logs
 ```
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `NEXT_PUBLIC_IMPROVED_CHECKOUT` | Enables the improved checkout flow | `false` |
-| `NEXT_PUBLIC_ADD_TO_CART_BUG` | Enables add-to-cart bug simulation for testing | `false` |
-| `CHECKOUT_PROVIDER_V2` | Routes checkout through payment provider V2 when set to exact `true` | `false` |
-| `POSTHOG_PROJECT_TOKEN` | PostHog project token for server-side checkout logs; keep it private | unset |
-| `POSTHOG_LOGS_ENDPOINT` | PostHog Logs OTLP/HTTP endpoint (EU example shown above) | `https://eu.i.posthog.com/i/v1/logs` |
+PostHog log delivery is optional and disabled when `POSTHOG_PROJECT_TOKEN` is empty. Never commit `.env.local` or place secrets in a `NEXT_PUBLIC_` variable.
 
-`CHECKOUT_PROVIDER_V2` is server-only. Missing values and every value other than exact `true` use the healthy V1 provider. Activate V2 by setting it to `true` in the target server environment. Roll back to V1 by setting it to `false` or removing it, then redeploy or restart the application.
+## Privacy and demo safety
 
-PostHog Logs are optional and remain disabled unless both server-side variables are set. Configure the project token only in a trusted server environment; do not use a `NEXT_PUBLIC_` prefix. The service uses `VERCEL_ENV` (falling back to `NODE_ENV`) for its environment and includes `VERCEL_GIT_COMMIT_SHA` as the release SHA when available. Log export is flushed before each instrumented API request completes. The V1 checkout endpoint is a healthy demo simulation; it does not charge a payment method or persist orders.
+Preserve the application's operational logging contract. Logs must not contain credentials, search text, product content, checkout form values, raw cart contents, secrets, provider payloads, or raw errors.
 
-### Operational event catalog
-
-| Event | Operational purpose | Safe domain metadata |
-|---|---|---|
-| `authentication.completed` | Login success, rejection, and server reliability | Outcome and HTTP status |
-| `catalog.retrieval.completed` | Catalog availability and returned inventory size | Outcome and item count |
-| `checkout.request.completed` | End-to-end checkout status and latency | Outcome and provider version |
-| `payment.authorization.completed` | Payment dependency result and latency | Outcome, provider version, stable error type |
-
-Every event includes the service/environment resource context plus route, method, status, duration, request ID, outcome, and release SHA when available. Successful completions are `INFO`, rejected or invalid requests are `WARN`, and dependency/internal failures are `ERROR`. Logs never include usernames, passwords, shipping/card fields, product names, raw cart contents, secrets, raw provider payloads, or raw errors.
-
-## Demo Checkout
-
-Checkout uses a simulated card form and never processes a real payment. **Do not enter real card information.** Use these harmless demo values:
-
-```text
-Cardholder: Demo Shopper
-Card number: 4111 1111 1111 1111
-Expiration: 12/34
-Security code: 123
-```
-
-Shipping and card fields stay in browser component memory and are not included in the checkout API request. The server receives only product IDs and quantities.
-
-## Running Locally
-
-```bash
-# Start development server
-pnpm dev
-
-# Build for production
-pnpm build
-
-# Start production server
-pnpm start
-
-# Run linting
-pnpm lint
-
-# Run tests
-pnpm test
-```
-
-The development server runs at [http://localhost:3000](http://localhost:3000).
+Checkout is simulated and does not charge a payment method or persist orders. Do not enter real payment information.
