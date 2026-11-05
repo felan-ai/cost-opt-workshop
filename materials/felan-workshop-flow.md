@@ -30,24 +30,9 @@ After changing the configuration, exit any existing Felan session. Start the bas
 
 ## 2. Create the baseline worktree
 
-From the original workshop repository, confirm that the working tree is clean and create a dedicated baseline worktree:
+From the original workshop repository, create a dedicated baseline worktree:
 
 ```bash
 cd path/to/cost-opt-workshop
-git status --short
 git worktree add ../cost-opt-workshop-baseline -b workshop/baseline main
-```
-
-Prepare the new worktree. Dependencies and ignored environment files are not shared between worktrees:
-
-```bash
-cd ../cost-opt-workshop-baseline
-pnpm install --frozen-lockfile
-cp .env.local.example .env.local
-```
-
-Start a fresh Felan session from the baseline worktree:
-
-```bash
-felan
 ```
