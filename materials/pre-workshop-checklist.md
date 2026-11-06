@@ -4,6 +4,8 @@ Complete these steps before the workshop. Do not start the implementation task y
 
 This checklist is the same for Felan, Claude Code, and Codex. Steps that apply to only some agents are marked **Felan**, **Claude Code**, or **Codex**.
 
+Commands that start with `/` are typed inside an agent session. All other commands run in a terminal. In Claude Code you can also run a terminal command from the session by prefixing it with `!`, for example `! rtk --version`.
+
 ## Tools
 
 - [ ] Install Node.js 20.9.0 or later and confirm with `node --version`.
@@ -156,13 +158,15 @@ The commands below are for macOS and Linux. Windows equivalents are noted where 
 
 - [ ] Add the Prewalk plugin marketplace without installing the plugin:
 
-  **Claude Code:**
+  **Claude Code**, in a session:
 
-  ```bash
-  claude plugin marketplace add TerenceLiu98/prewalk
+  ```text
+  /plugin marketplace add TerenceLiu98/prewalk
   ```
 
-  **Codex:**
+  Run `/plugin marketplace list` and confirm `prewalk` is listed. Note the marketplace name it shows; the plugin is installed as `prewalk@<marketplace name>` during the workshop.
+
+  **Codex**, in a terminal:
 
   ```bash
   codex plugin marketplace add TerenceLiu98/prewalk

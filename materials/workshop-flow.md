@@ -2,6 +2,8 @@
 
 This flow is the same for Felan, Claude Code, and Codex. Steps that differ between agents are marked **Felan**, **Claude Code**, or **Codex**.
 
+Commands that start with `/` are typed inside an agent session. All other commands run in a terminal. In Claude Code you can also run a terminal command from the session by prefixing it with `!`, for example `! rtk gain --history`.
+
 The run order matters. The baseline runs first, while none of the optimization tools are active. The tools are then turned on one at a time in the extension exercises, and the enhanced run uses all of them. Do not turn on a tool before its exercise.
 
 | Run | Felan / Codex model | Claude Code model |
@@ -192,10 +194,12 @@ Turn it on:
 | Agent | Command |
 |---|---|
 | Felan | `"prewalk": true` |
-| Claude Code | `claude plugin install prewalk@prewalk` |
-| Codex | `codex plugin add prewalk@prewalk-marketplace` |
+| Claude Code | `/plugin install prewalk@prewalk` in a session |
+| Codex | `codex plugin add prewalk@prewalk-marketplace` in a terminal |
 
-Check: start a new session and run `/prewalk:pw-doctor` (Claude Code) or `$prewalk:pw-doctor` (Codex).
+If `/plugin marketplace list` showed a different marketplace name before the workshop, use `prewalk@<that name>`.
+
+Check: exit and start a new session, because a running session does not load a newly installed plugin. Then run `/prewalk:pw-doctor` (Claude Code) or `$prewalk:pw-doctor` (Codex).
 
 Exercise: _placeholder — prompt and task to be added._
 
@@ -278,7 +282,7 @@ The tools stay configured after the workshop. To remove them:
 |---|---|---|
 | RTK | `rtk init -g --uninstall` | `rtk init -g --codex --uninstall` |
 | Codebase Memory | `codebase-memory-mcp uninstall` (all agents) | same |
-| Prewalk | `claude plugin uninstall prewalk@prewalk` | remove it through `/plugins` |
+| Prewalk | `/plugin uninstall prewalk@prewalk` | remove it through `/plugins` |
 | MarkItDown | `claude mcp remove --scope user markitdown` | `codex mcp remove markitdown` |
 
 Codebase Memory's uninstaller can leave its skill folders behind. Check `~/.claude/skills`, `~/.agents/skills`, and `~/.codex/skills` for a `codebase-memory` folder and delete it if present.
