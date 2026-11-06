@@ -1,10 +1,5 @@
 {
   "mcpServers": {
-    "codebase-memory-mcp": {
-      "type": "stdio",
-      "command": "codebase-memory-mcp",
-      "args": []
-    },
     "markitdown": {
       "type": "stdio",
       "command": "markitdown-mcp",

@@ -107,14 +107,16 @@ During the workshop, run implementation sessions from the corresponding worktree
 
 ## Claude Code participants only
 
-Felan participants can skip this section. Felan turns the optimization extensions on and off through its own configuration; Claude Code has no equivalent switch, so the four tools are installed as standalone programs and enabled only through launch flags:
+Felan participants can skip this section. Felan turns the optimization extensions on and off through its own configuration; Claude Code has no equivalent switch. Codebase Memory is installed globally with its full Claude Code setup and switched off for the baseline through `/mcp`; the other tools are enabled only through launch flags:
 
 | Run | Model | RTK | Codebase Memory | Prewalk | MarkItDown |
 |---|---|---|---|---|---|
 | Baseline | `opus`, effort `high` | off | off | off | off |
 | Enhanced | `opus`, effort `high` (Prewalk hands off to its executor) | on | on | on | on |
 
-Do not install any of the tools into your global Claude Code configuration. Skip `rtk init -g`, `claude mcp add --scope user`, `claude plugin install`, and the Codebase Memory agent setup. Global installs would apply to the baseline run as well.
+Codebase Memory is the only tool installed into your global Claude Code configuration (`~/.claude`): its installer adds an MCP server registration, hooks, a skill, and three agents. Do not install the other tools globally: skip `rtk init -g` and `claude plugin install`.
+
+Both runs start with `--setting-sources project,local`, which ignores your personal `~/.claude/settings.json`, including the hooks Codebase Memory adds there and any plugins you enabled. MCP servers you registered, including Codebase Memory, still load; the baseline turns Codebase Memory off through `/mcp`. The Codebase Memory skill and agents in `~/.claude` also load in both runs. In the baseline they cannot reach the graph tools, and this is accepted.
 
 The commands below are for macOS and Linux. Windows equivalents are noted where they exist. Native Windows has not been tested for this workshop; WSL is recommended.
 
@@ -136,16 +138,27 @@ The commands below are for macOS and Linux. Windows equivalents are noted where 
 
   Windows: `winget install rtk-ai.rtk`
 
-- [ ] Install the Codebase Memory binary without its automatic agent configuration:
+- [ ] Install Codebase Memory with its full agent configuration and confirm it reports `0.12.1` or later:
 
   ```bash
-  curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash -s -- --skip-config
+  curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash
   codebase-memory-mcp --version
   ```
 
-  Windows: download `install.ps1` as described in the [Codebase Memory README](https://github.com/DeusData/codebase-memory-mcp#quick-start) and run `.\install.ps1 --skip-config`.
+  Windows: download `install.ps1` as described in the [Codebase Memory README](https://github.com/DeusData/codebase-memory-mcp#quick-start) and run `.\install.ps1`.
 
-  The binary is installed to `~/.local/bin`. If `codebase-memory-mcp` is not found, add that directory to your `PATH` and open a new terminal.
+  The binary is installed to `~/.local/bin`. If `codebase-memory-mcp` is not found, add that directory to your `PATH` and open a new terminal. The installer also configures every other coding agent it detects (for example Codex or VS Code); remove that later with `codebase-memory-mcp uninstall`.
+
+  If `curl` reports `Couldn't connect to server`, retry with `curl -4`, or open the `install.sh` URL in a browser, save the file, and run `bash install.sh`.
+
+- [ ] Confirm the global Claude Code setup was created:
+
+  ```bash
+  claude mcp list
+  ls ~/.claude/agents ~/.claude/skills
+  ```
+
+  `codebase-memory-mcp` should be listed as connected, and the `codebase-memory`, `codebase-memory-scout`, and `codebase-memory-auditor` agents and the `codebase-memory` skill should be present.
 
 - [ ] Install `uv` and the MarkItDown MCP server:
 
@@ -188,17 +201,15 @@ The commands below are for macOS and Linux. Windows equivalents are noted where 
 
   ```bash
   cd ../cost-opt-workshop-baseline
-  claude --setting-sources project,local --strict-mcp-config --model opus --effort high
+  claude --setting-sources project,local --model opus --effort high
   ```
 
-  `--setting-sources project,local` ignores your personal `~/.claude/settings.json`, including any hooks and plugins. `--strict-mcp-config` ignores every MCP server you registered yourself.
-
-- [ ] Run `/mcp` and confirm no MCP servers are listed.
+- [ ] Run `/mcp`, select `codebase-memory-mcp`, and choose **Disable**. Claude Code remembers this for the baseline worktree, so later baseline sessions start with it off. Confirm it is shown as disabled.
 - [ ] Run `/hooks` and confirm no `rtk` or `codebase-memory-mcp` hooks are listed.
 - [ ] Type `/prewalk` and confirm no Prewalk commands are suggested.
 - [ ] Exit the session.
 
-If something still appears, check `~/.claude/CLAUDE.md` and `~/.claude/skills/` for RTK, Codebase Memory, or Prewalk instructions left by an earlier global install. Those files load regardless of the flags above.
+The `codebase-memory` skill and agents are still listed in the baseline; that is expected. If a `codebase-memory-mcp` hook appears, confirm the session was started with `--setting-sources project,local`.
 
 ### Verify the enhanced launch
 
@@ -206,14 +217,18 @@ If something still appears, check `~/.claude/CLAUDE.md` and `~/.claude/skills/` 
 
   ```bash
   cd ../cost-opt-workshop-enhanced
-  claude --setting-sources project,local --strict-mcp-config --model opus --effort high \
+  claude --setting-sources project,local --model opus --effort high \
     --settings materials/claude/enhanced-settings.json \
     --mcp-config materials/claude/enhanced-mcp.json \
     --plugin-dir ~/.workshop-tools/prewalk/claude-code
   ```
 
-- [ ] Run `/mcp` and confirm `codebase-memory-mcp` and `markitdown` are both connected.
+  `codebase-memory-mcp` comes from the global install. `enhanced-settings.json` adds the Codebase Memory and RTK hooks that `--setting-sources project,local` skips, and `enhanced-mcp.json` adds MarkItDown.
+
+- [ ] Run `/mcp` and confirm `codebase-memory-mcp` and `markitdown` are both connected. If `codebase-memory-mcp` is disabled, enable it there.
 - [ ] Run `/hooks` and confirm `rtk hook claude` and `codebase-memory-mcp hook-augment` are listed.
+- [ ] Run `/agents` and confirm the `codebase-memory`, `codebase-memory-scout`, and `codebase-memory-auditor` agents are listed.
+- [ ] Type `/codebase-memory` and confirm the Codebase Memory skill is suggested.
 - [ ] Type `/prewalk` and confirm the `/prewalk:prewalk` and `/prewalk:pw-go` commands are suggested.
 - [ ] Ask the session to run `git status`, then confirm that `rtk gain --history` lists `rtk git status` with the current time.
 - [ ] Exit the session.
