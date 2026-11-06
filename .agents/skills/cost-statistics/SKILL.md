@@ -18,7 +18,7 @@ Analyze a completed implementation session from a separate, read-only analyst se
 2. Locate the transcript using the agent's native session storage. For Felan, search `~/.felan/sessions/*.jsonl`.
 3. If a name matches multiple sessions, show the candidates with ID, time, model, working directory, and first prompt. Ask the user to choose; do not guess by recency.
 4. Find every reviewer, worker, or other descendant session referenced by the root transcript. Include their usage recursively, but exclude this analyst session and unrelated sessions.
-5. Calculate with `jq`, Node, Python, or equivalent. Do not add long token or tool breakdowns mentally.
+5. Calculate with one bounded `jq`, Node, Python, or equivalent parsing pass that emits task boundaries, descendants, usage totals, model/session breakdowns, and failed tool calls. Reuse those results; do not repeatedly rescan complete transcripts or add long breakdowns mentally.
 6. Measure task time from the initial root task prompt to the final root assistant response after implementation, reviews, corrections, and verification. Report the start timestamp, end timestamp, and elapsed duration. Do not use session creation time or add overlapping child durations.
 7. Sum observed usage across the root and descendants:
    - uncached input, cache read, cache write, output, reasoning, total tokens
@@ -28,9 +28,9 @@ Analyze a completed implementation session from a separate, read-only analyst se
 9. Identify the model workflow in chronological order, including each model's role and thinking level when recorded. Do not infer thinking levels or phase boundaries that the transcript does not expose.
 10. Attribute cost to observed phases when transcript markers make the boundary clear: frontier planning/root work, delegated or handed-off implementation, and independent review. Use `N/A` rather than assigning cost from model names alone.
 11. Summarize tests, typecheck, build, lint, browser checks, and other verification only when the transcript confirms them. Report the final automated test result and passed-test count when available.
-12. Use the implementation session's recorded working directory—not the analyst session's directory—to inspect the final diff and relevant source files, then apply the quality rubric below. Cite concrete evidence for every score. If that worktree no longer exists, score only what transcript evidence demonstrates and state the limitation.
+12. Use the implementation session's recorded working directory—not the analyst session's directory—to inspect only the changed and directly relevant source files, then apply the quality rubric below. Score this workshop-sized change directly; do not launch a separate quality-scoring subagent. Cite concrete evidence for every score. If that worktree no longer exists, score only what transcript evidence demonstrates and state the limitation.
 13. Resolve the workshop repository root with `git rev-parse --show-toplevel`. Create `<repo-root>/workshop-results/` and save both Markdown and HTML versions of the report there. This report directory is the only allowed write location.
-14. Verify that both files exist and contain the same metrics, evidence, limitations, and quality scores. Check that the HTML renders correctly in a browser when available; otherwise state that visual verification was not performed. Include both file paths in the final response.
+14. Verify statically that both files exist and contain the same headline metrics, evidence, limitations, and quality scores. Check the HTML structure and confirm it has no scripts or external resources. Do not launch a browser solely to validate the report. Include both file paths in the final response.
 
 ## Rules
 
@@ -40,6 +40,17 @@ Analyze a completed implementation session from a separate, read-only analyst se
 - Reasoning tokens are normally included in output accounting; do not add them twice.
 - Use `N/A`, not zero, when evidence is unavailable.
 - If task boundaries, descendants, or usage are ambiguous, state the ambiguity and ask rather than inventing a number.
+- Count **failed operations** as unique tool calls whose result is explicitly marked as an error, plus unique background jobs that later reach a terminal failed state when the launch call itself was not marked as an error. Deduplicate completion notices and later log reads of the same failure.
+- Do not create a task graph for a single report and do not delegate report writing or quality scoring for this workshop-sized task.
+
+## Performance and concision
+
+- Prioritize task time, cost, and token categories. Quality and verification are supporting context.
+- Aim for a report that can be read in a few minutes. Keep evidence to one concise sentence per quality criterion.
+- Limit the limitations section to the five most material points.
+- Omit transcript hashes, raw line-by-line timelines, full tool-call inventories, detailed failed-operation tables, and reproducibility appendices unless the user explicitly requests them.
+- Do not rerun implementation tests, builds, lint, or browser checks. Report only verification recorded by the implementation session.
+- Generate Markdown and HTML from the same calculated values in one pass. Do not independently reconstruct the report twice.
 
 ## Quality Score
 
@@ -156,6 +167,7 @@ workshop-results/baseline-<session-id>.html
 - Use semantic headings and tables with header cells. Provide readable contrast, responsive layouts, horizontally scrollable wide tables, wrapping for long paths and IDs, and print-friendly styles.
 - Escape transcript-derived and other untrusted text before inserting it into HTML. Do not render raw HTML from transcripts or Markdown and do not create active links from untrusted URLs.
 - When creating an HTML companion for an existing Markdown report, preserve its figures and evidence. Do not silently recalculate or change the analysis.
+- Validate HTML statically: confirm the document structure, required headline values, table count, and absence of scripts or external `src`/`href` resources. Do not use browser automation solely for report rendering checks.
 
 For final comparison mode, ask for the enhanced session name or ID and the baseline report when either is missing. Analyze the enhanced session with the same rules, then add:
 
