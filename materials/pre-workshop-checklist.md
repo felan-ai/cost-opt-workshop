@@ -10,7 +10,12 @@ Complete these steps before the workshop. Do not start the implementation task y
 
 ## Repository setup
 
-- [ ] Clone the workshop repository and enter its directory.
+- [ ] Clone the workshop repository and enter its directory:
+
+  ```bash
+  git clone https://github.com/felan-ai/cost-opt-workshop.git
+  cd cost-opt-workshop
+  ```
 - [ ] Install the locked dependencies:
 
   ```bash
