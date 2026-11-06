@@ -115,6 +115,14 @@ Then provide:
 | Production build verified | |
 | Lint verified | |
 
+Immediately below the headline table, add a compact interpretation note covering:
+
+- task time is root prompt to final root response, including review and verification but not summed child durations
+- uncached input is newly processed input; cache read/write are provider cache activity; output is generated output
+- reasoning is normally a subset of output and is not added twice
+- total processed tokens = uncached input + cache read + cache write + output
+- API-equivalent cost is observed provider usage, not a subscription charge
+
 After the table, include a compact model/session breakdown, a two-column verification summary (`Check | Result`), and up to five material limitations. Do not add a transcript-evidence column.
 
 Add a model workflow table:
@@ -152,6 +160,8 @@ Then include the complete scored rubric:
 | 9 | Accessibility | | |
 | 10 | Maintainability | | |
 | | **Workshop quality score** | **X/10** | |
+
+Immediately below the rubric, add this concise scoring legend: `1 = demonstrated, 0.5 = partially demonstrated, 0 = failed or not demonstrated.` State that the final score is the sum of the ten criteria. Mention a critical-failure safeguard only when one actually changes the score.
 
 Save each baseline report in both formats:
 
@@ -226,7 +236,7 @@ Finally, report every quality criterion for both runs rather than only the total
 | 10 | Maintainability | | | |
 | | **Workshop quality score** | | | |
 
-After this table, provide at most one concise evidence sentence for each baseline and enhanced criterion. Do not include arithmetic formulas, transcript line references, or explanations of safeguards that did not apply. If the saved baseline report lacks criterion-level scores or required fields, ask to regenerate it with the current skill instead of inventing values.
+After this table, include the same concise scoring legend and provide at most one evidence sentence for each baseline and enhanced criterion. Do not include arithmetic formulas, transcript line references, or explanations of safeguards that did not apply. If the saved baseline report lacks criterion-level scores or required fields, ask to regenerate it with the current skill instead of inventing values.
 
 Save the final comparison in both formats using the same HTML requirements:
 
