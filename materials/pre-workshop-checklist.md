@@ -185,7 +185,20 @@ The commands below are for macOS and Linux. Windows equivalents are noted where 
   }
   ```
 
-  Only Prewalk reads this file, so it has no effect until Prewalk is installed.
+- [ ] **Codex:** configure the model Prewalk hands off to after planning. Create `~/.codex/prewalk-presets.toml`:
+
+  ```toml
+  default_preset = "workshop"
+
+  [presets.workshop]
+  executor = "gpt-6-luna"
+  executor_effort = "medium"
+  handoff_mode = "spawn"
+  require_model_routing = true
+  max_todos = 12
+  ```
+
+  Only Prewalk reads these files, so they have no effect until Prewalk is installed.
 
 ## Confirm a clean starting state
 

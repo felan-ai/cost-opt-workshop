@@ -7,6 +7,7 @@ The run order matters. The baseline runs first, while none of the optimization t
 | Run | Felan / Codex model | Claude Code model |
 |---|---|---|
 | Baseline and enhanced implementation | `gpt-6-astra`, thinking `high` | `claude-opus-5-5`, effort `high` |
+| Prewalk executor (enhanced run, after planning) | Codex: `gpt-6-luna`, effort `medium` | `sonnet` |
 | Evaluator | `gpt-6.1-sol`, thinking `medium` | `claude-sonnet-5-5`, effort `medium` |
 
 ## 1. Configure the baseline agent
