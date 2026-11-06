@@ -2,11 +2,20 @@
 
 Complete these steps before the workshop. Do not start the implementation task yet.
 
+This checklist is the same for Felan, Claude Code, and Codex. Steps that apply to only some agents are marked **Felan**, **Claude Code**, or **Codex**.
+
 ## Tools
 
 - [ ] Install Node.js 20.9.0 or later and confirm with `node --version`.
 - [ ] Install pnpm and confirm with `pnpm --version`.
 - [ ] Install and authenticate the coding agent you will use: Felan, Claude Code, or Codex.
+- [ ] **Claude Code and Codex:** confirm the minimum versions required by the workshop tools, and Python 3.10 or later:
+
+  ```bash
+  claude --version     # Claude Code 2.1.145 or later
+  codex --version      # Codex CLI 0.146.0 or later
+  python3 --version
+  ```
 
 ## Repository setup
 
@@ -16,6 +25,7 @@ Complete these steps before the workshop. Do not start the implementation task y
   git clone https://github.com/felan-ai/cost-opt-workshop.git
   cd cost-opt-workshop
   ```
+
 - [ ] Install the locked dependencies:
 
   ```bash
@@ -104,37 +114,15 @@ git worktree add ../cost-opt-workshop-enhanced -b workshop/enhanced main
 
 During the workshop, run implementation sessions from the corresponding worktree. Run evaluator sessions from the original `cost-opt-workshop` repository so all reports are saved together under `workshop-results/`.
 
-## Verify the coding agent
+## Download the optimization tools
 
-- [ ] Start a fresh agent session from the repository root.
-- [ ] Confirm the `cost-statistics` skill is available.
-- [ ] Exit that session. Start a new session for the baseline implementation during the workshop.
+**Felan** participants can skip this section: the four tools are built into Felan and are turned on through its configuration during the workshop.
 
-## Claude Code participants only
-
-Felan participants can skip this section. Felan turns the optimization extensions on and off through its own configuration; Claude Code has no equivalent switch. Codebase Memory is installed globally with its full Claude Code setup and switched off for the baseline through `/mcp`; the other tools are enabled only through launch flags:
-
-| Run | Model | RTK | Codebase Memory | Prewalk | MarkItDown |
-|---|---|---|---|---|---|
-| Baseline | `opus`, effort `high` | off | off | off | off |
-| Enhanced | `opus`, effort `high` (Prewalk hands off to its executor) | on | on | on | on |
-
-Codebase Memory is the only tool installed into your global Claude Code configuration (`~/.claude`): its installer adds an MCP server registration, hooks, a skill, and three agents. Do not install the other tools globally: skip `rtk init -g` and `claude plugin install`.
-
-Both runs start with `--setting-sources project,local`, which ignores your personal `~/.claude/settings.json`, including the hooks Codebase Memory adds there and any plugins you enabled. MCP servers you registered, including Codebase Memory, still load; the baseline turns Codebase Memory off through `/mcp`. The Codebase Memory skill and agents in `~/.claude` also load in both runs. In the baseline they cannot reach the graph tools, and this is accepted.
+**Claude Code and Codex:** download the four tools now, but do not configure them. A downloaded program does nothing until it is configured; configuration happens during the workshop, after the baseline run, and works offline. Downloading now catches network and install problems before the workshop.
 
 The commands below are for macOS and Linux. Windows equivalents are noted where they exist. Native Windows has not been tested for this workshop; WSL is recommended.
 
-### Install the tools
-
-- [ ] Confirm Claude Code 2.1.145 or later and Python 3.10 or later:
-
-  ```bash
-  claude --version
-  python3 --version
-  ```
-
-- [ ] Install RTK and confirm it reports `rtk 1.1.0` or later. A different crate named `rtk` exists; if `rtk --help` does not mention token-optimized output, you have the wrong one.
+- [ ] Install RTK and confirm it reports `rtk 1.1.0` or later. A different crate named `rtk` exists; if `rtk --help` does not mention token-optimized output, you have the wrong one. Do not run `rtk init` yet.
 
   ```bash
   brew install rtk
@@ -143,27 +131,18 @@ The commands below are for macOS and Linux. Windows equivalents are noted where 
 
   Windows: `winget install rtk-ai.rtk`
 
-- [ ] Install Codebase Memory with its full agent configuration and confirm it reports `0.12.1` or later:
+- [ ] Install the Codebase Memory binary without its agent configuration and confirm it reports `0.12.1` or later:
 
   ```bash
-  curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash -s -- --skip-config
   codebase-memory-mcp --version
   ```
 
-  Windows: download `install.ps1` as described in the [Codebase Memory README](https://github.com/DeusData/codebase-memory-mcp#quick-start) and run `.\install.ps1`.
+  Windows: download `install.ps1` as described in the [Codebase Memory README](https://github.com/DeusData/codebase-memory-mcp#quick-start) and run `.\install.ps1 --skip-config`.
 
-  The binary is installed to `~/.local/bin`. If `codebase-memory-mcp` is not found, add that directory to your `PATH` and open a new terminal. The installer also configures every other coding agent it detects (for example Codex or VS Code); remove that later with `codebase-memory-mcp uninstall`.
+  The binary is installed to `~/.local/bin`. If `codebase-memory-mcp` is not found, add that directory to your `PATH` and open a new terminal.
 
-  If `curl` reports `Couldn't connect to server`, retry with `curl -4`, or open the `install.sh` URL in a browser, save the file, and run `bash install.sh`.
-
-- [ ] Confirm the global Claude Code setup was created:
-
-  ```bash
-  claude mcp list
-  ls ~/.claude/agents ~/.claude/skills
-  ```
-
-  `codebase-memory-mcp` should be listed as connected, and the `codebase-memory`, `codebase-memory-scout`, and `codebase-memory-auditor` agents and the `codebase-memory` skill should be present.
+  If `curl` reports `Couldn't connect to server`, retry with `curl -4`, or open the `install.sh` URL in a browser, save the file, and run `bash install.sh --skip-config`.
 
 - [ ] Install `uv` and the MarkItDown MCP server:
 
@@ -175,13 +154,21 @@ The commands below are for macOS and Linux. Windows equivalents are noted where 
 
   Windows: `winget install astral-sh.uv`, then the same `uv tool install` command.
 
-- [ ] Download Prewalk 0.4.0. It is loaded only for the enhanced session and is never installed as a plugin:
+- [ ] Add the Prewalk plugin marketplace without installing the plugin:
+
+  **Claude Code:**
 
   ```bash
-  git clone --branch v0.4.0 --depth 1 https://github.com/TerenceLiu98/prewalk ~/.workshop-tools/prewalk
+  claude plugin marketplace add TerenceLiu98/prewalk
   ```
 
-- [ ] Configure the model Prewalk hands off to after planning. Create `~/.claude/prewalk-presets.json`:
+  **Codex:**
+
+  ```bash
+  codex plugin marketplace add TerenceLiu98/prewalk
+  ```
+
+- [ ] **Claude Code:** configure the model Prewalk hands off to after planning. Create `~/.claude/prewalk-presets.json`:
 
   ```json
   {
@@ -198,46 +185,43 @@ The commands below are for macOS and Linux. Windows equivalents are noted where 
   }
   ```
 
-  Only Prewalk reads this file, so it does not affect the baseline run.
+  Only Prewalk reads this file, so it has no effect until Prewalk is installed.
 
-### Verify the baseline launch
+## Confirm a clean starting state
 
-- [ ] Start a baseline session from the baseline worktree:
+The baseline runs with none of the optimization tools active. Earlier installs of these tools, or personal hooks that do the same job, would make the baseline look cheaper than it is.
 
-  ```bash
-  cd ../cost-opt-workshop-baseline
-  claude --setting-sources project,local --model opus --effort high
-  ```
-
-- [ ] Run `/mcp`, select `codebase-memory-mcp`, and choose **Disable**. Claude Code remembers this for the baseline worktree, so later baseline sessions start with it off. Confirm it is shown as disabled.
-- [ ] Run `/hooks` and confirm no `rtk` or `codebase-memory-mcp` hooks are listed.
-- [ ] Type `/prewalk` and confirm no Prewalk commands are suggested.
-- [ ] Exit the session.
-
-The `codebase-memory` skill and agents are still listed in the baseline; that is expected. If a `codebase-memory-mcp` hook appears, confirm the session was started with `--setting-sources project,local`.
-
-### Verify the enhanced launch
-
-- [ ] Start an enhanced session from the enhanced worktree:
+- [ ] **Claude Code:** confirm none of the tools is configured:
 
   ```bash
-  cd ../cost-opt-workshop-enhanced
-  claude --setting-sources project,local --model opus --effort high \
-    --settings materials/claude/enhanced-settings.json \
-    --mcp-config materials/claude/enhanced-mcp.json \
-    --plugin-dir ~/.workshop-tools/prewalk/claude-code
+  claude mcp list                                   # no codebase-memory-mcp or markitdown
+  rtk init --show                                   # Hook: not found, RTK.md: not found
+  ls ~/.claude/agents ~/.claude/skills              # no codebase-memory entries
+  grep -i -E "rtk|codebase-memory" ~/.claude/CLAUDE.md   # no output
   ```
 
-  `codebase-memory-mcp` comes from the global install. `enhanced-settings.json` adds the Codebase Memory and RTK hooks that `--setting-sources project,local` skips, and `enhanced-mcp.json` adds MarkItDown.
+  In a Claude Code session, run `/plugin` and confirm Prewalk is not installed.
 
-- [ ] Run `/mcp` and confirm `codebase-memory-mcp` and `markitdown` are both connected. If `codebase-memory-mcp` is disabled, enable it there.
-- [ ] Run `/hooks` and confirm `rtk hook claude` and `codebase-memory-mcp hook-augment` are listed.
-- [ ] Run `/agents` and confirm the `codebase-memory`, `codebase-memory-scout`, and `codebase-memory-auditor` agents are listed.
-- [ ] Type `/codebase-memory` and confirm the Codebase Memory skill is suggested.
-- [ ] Type `/prewalk` and confirm the `/prewalk:prewalk` and `/prewalk:pw-go` commands are suggested.
-- [ ] Ask the session to run `git status`, then confirm that `rtk gain --history` lists `rtk git status` with the current time.
-- [ ] Exit the session.
+- [ ] **Codex:** confirm none of the tools is configured:
 
-RTK may print `No hook installed`. It only checks the global configuration, so the warning is expected.
+  ```bash
+  codex mcp list                                    # no codebase-memory-mcp or markitdown
+  grep -i -E "rtk|codebase-memory|markitdown|prewalk" ~/.codex/config.toml ~/.codex/AGENTS.md   # no output
+  ls ~/.codex/agents ~/.agents/skills ~/.codex/skills   # no codebase-memory entries
+  ```
 
-If any check fails, resolve it before the workshop ( ask your agent for help ) or send the failure details to the facilitator.
+  In a Codex session, run `/plugins` and confirm Prewalk is not installed.
+
+- [ ] **Felan:** confirm the four `builtinExtensions` entries are set to `false`.
+
+- [ ] If any of the tools is already configured, remove it with the commands in the "After the workshop" section of [`workshop-flow.md`](workshop-flow.md) and repeat the check.
+
+- [ ] Review your personal agent configuration for hooks, plugins, or instructions that compress command output or add code context, such as other token-saving tools. Turn them off for the workshop. Hooks that do not change what the agent sees, such as status or notification hooks, can stay on.
+
+## Verify the coding agent
+
+- [ ] Start a fresh agent session from the repository root.
+- [ ] Confirm the `cost-statistics` skill is available.
+- [ ] Exit that session. Start a new session for the baseline implementation during the workshop.
+
+If any check fails, resolve it before the workshop (ask your agent for help) or send the failure details to the facilitator.

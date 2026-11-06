@@ -14,7 +14,7 @@ Participants implement the same feature twice in the Storzy application: first w
 |---|---|
 | `app/`, `components/`, `lib/` | Storzy application used for the coding exercise |
 | `materials/pre-workshop-checklist.md` | Setup and readiness checks to complete before the event |
-| `materials/felan-workshop-flow.md` | Step-by-step Felan baseline and enhanced workflow |
+| `materials/workshop-flow.md` | Step-by-step baseline, extension exercises, and enhanced workflow for Felan, Claude Code, and Codex |
 | `materials/implementation-task.md` | Exact feature prompt used for both runs |
 | `materials/manual-verification.md` | Five-check manual validation checklist |
 | `.agents/skills/cost-statistics/` | Cost and quality evaluation skill for Felan and Codex |
@@ -56,6 +56,8 @@ Password: password
 ```
 
 ## Workshop flow
+
+The full step-by-step flow, including the extension exercises and agent-specific commands, is in [`materials/workshop-flow.md`](materials/workshop-flow.md). The summary is below.
 
 ### 1. Baseline implementation
 
