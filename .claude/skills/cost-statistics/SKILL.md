@@ -19,7 +19,7 @@ Analyze a completed implementation session from a separate, read-only analyst se
 3. If a name matches multiple sessions, show the candidates with ID, time, model, working directory, and first prompt. Ask the user to choose; do not guess by recency.
 4. Find every reviewer, worker, or other descendant session referenced by the root transcript. Include their usage recursively, but exclude this analyst session and unrelated sessions.
 5. Calculate with `jq`, Node, Python, or equivalent. Do not add long token or tool breakdowns mentally.
-6. Measure task time from the initial root task prompt to the final root assistant response after implementation, reviews, corrections, and verification. Do not use session creation time or add overlapping child durations.
+6. Measure task time from the initial root task prompt to the final root assistant response after implementation, reviews, corrections, and verification. Report the start timestamp, end timestamp, and elapsed duration. Do not use session creation time or add overlapping child durations.
 7. Sum observed usage across the root and descendants:
    - uncached input, cache read, cache write, output, reasoning, total tokens
    - recorded cost, model calls, tool calls, failed operations
@@ -68,7 +68,17 @@ Show all ten rubric rows. Every row must include its individual numeric score an
 
 ## Required Output
 
-Start with the session ID, task prompt excerpt, working directory, models, and included descendant IDs. Then provide:
+Start with the session ID, task prompt excerpt, working directory, models, and included descendant IDs. The headline statistics below are the primary workshop result and must appear before workflow, verification, or quality analysis.
+
+Keep token categories distinct:
+
+- **Uncached input tokens:** newly billed input tokens.
+- **Cache-read tokens:** input tokens reused from provider cache.
+- **Cache-write tokens:** input tokens written to cache when the provider reports them.
+- **Output tokens:** generated output, normally including reasoning tokens.
+- **Total processed tokens:** uncached input + cache read + cache write + output.
+
+Then provide:
 
 | Metric | Value |
 |---|---:|
