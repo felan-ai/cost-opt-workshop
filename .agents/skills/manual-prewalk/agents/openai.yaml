@@ -1,0 +1,7 @@
+interface:
+  display_name: "Manual Prewalk"
+  short_description: "Frontier plans and makes one verified edit; a manually selected executor finishes in the same session."
+  default_prompt: "Use $manual-prewalk with an implementation task, then switch models and invoke $manual-prewalk resume."
+
+policy:
+  allow_implicit_invocation: false
