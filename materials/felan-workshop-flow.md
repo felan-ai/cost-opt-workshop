@@ -43,9 +43,29 @@ Copy the complete contents of [`implementation-task.md`](implementation-task.md)
 
 Submit the prompt unchanged. Do not add implementation hints, acceptance criteria, workshop context, or instructions about cost measurement. The same prompt must be used for both the baseline and enhanced runs.
 
-## 4. Analyze the baseline implementation
+## 4. Evaluate the baseline implementation
 
-Wait for the baseline agent to finish its implementation, review, corrections, and verification. Record the root implementation session ID, then exit the implementation session.
+Wait for the baseline agent to finish its implementation, review, corrections, and verification.
+
+### 4.1 Manually inspect the session data
+
+Before leaving the implementation session, open the coding agent's native session or usage view. Use the corresponding console UI in Felan, Claude Code, or Codex.
+
+Record or confirm the information the UI exposes:
+
+- root session ID and session name
+- models used
+- elapsed time
+- input, cached, and output tokens
+- reported cost or usage
+- implementation subagents or reviewers
+- final verification summary
+
+Different agents expose different fields. Record unavailable values as `N/A`; do not estimate them. This manual inspection is a quick sanity check, not the comprehensive report.
+
+Record the root implementation session ID, then exit the implementation session.
+
+### 4.2 Generate the comprehensive report
 
 Use a fixed non-frontier evaluator configuration for both the baseline report and final comparison:
 
