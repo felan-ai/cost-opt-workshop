@@ -119,3 +119,45 @@ Use the cost-statistics skill to create a baseline report for session <BASELINE_
 ```
 
 The evaluator reads the implementation session and its descendants, inspects the baseline worktree, and saves the report under `workshop-results/` in the control repository. The evaluator session's usage is workshop overhead and must not be included in the implementation statistics.
+
+## Intermediate extension exercises
+
+Additional exercises will be inserted here before the final enhanced run. They will test RTK Optimizer, Codebase Memory, Prewalk, and MarkItDown independently with separate prompts and tasks.
+
+## N. Run the final task with extensions enabled
+
+The exact step number will be assigned after the intermediate exercises are finalized.
+
+### N.1 Configure the enhanced agent
+
+Keep the same root model and thinking level used for the baseline so the implementation prompt and primary model remain controlled:
+
+```json
+{
+  "defaultModel": "gpt-6-astra",
+  "defaultThinkingLevel": "high",
+  "builtinExtensions": {
+    "prewalk": true,
+    "rtkOptimizer": true,
+    "codebaseMemory": true,
+    "markitdown": true
+  }
+}
+```
+
+Exit any existing Felan session after changing the configuration.
+
+### N.2 Start the enhanced implementation session
+
+Start a fresh Felan session from the prepared enhanced worktree:
+
+```bash
+cd path/to/cost-opt-workshop-enhanced
+felan
+```
+
+### N.3 Submit the same implementation task
+
+Copy the complete contents of [`implementation-task.md`](implementation-task.md) and submit them unchanged as the first user prompt.
+
+Do not add hints, workshop context, extension instructions, or measurement instructions to the task prompt. Wait for the root agent, implementation workers, reviewers, corrections, and verification to finish, then record the enhanced root session ID.
