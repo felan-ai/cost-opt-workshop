@@ -49,6 +49,8 @@ Analyze a completed implementation session from a separate, read-only analyst se
 - Aim for a report that can be read in a few minutes. Keep evidence to one concise sentence per quality criterion.
 - Limit the limitations section to the five most material points.
 - Omit transcript hashes, raw line-by-line timelines, full tool-call inventories, detailed failed-operation tables, and reproducibility appendices unless the user explicitly requests them.
+- Do not include dedicated sections for evidence sources, inspected-file inventories, failed-operation accounting, or human-intervention accounting. Keep useful conclusions in the headline, verification, quality, or limitations sections.
+- Avoid transcript line-number references in the reader-facing report. State confirmed results and concise source-code evidence directly.
 - Do not rerun implementation tests, builds, lint, or browser checks. Report only verification recorded by the implementation session.
 - Generate Markdown and HTML from the same calculated values in one pass. Do not independently reconstruct the report twice.
 
@@ -69,14 +71,14 @@ Score each criterion `1` for demonstrated, `0.5` for partial, or `0` for failed 
 | 9 | Accessibility | Label, keyboard operation, and loading/empty announcements are present |
 | 10 | Maintainability | Focused change, no unnecessary dependency, clear code, meaningful tests |
 
-Add the ten values for a score out of 10. Apply these caps after summing:
+Add the ten values for a score out of 10. Apply these critical-failure safeguards internally after summing:
 
 - Application does not build: maximum `4/10`.
 - Core search is missing or only client-side: maximum `3/10`.
 - Material cart, sorting, or retry regression: maximum `5/10`.
 - Search terms or product content are exposed in operational logs: maximum `5/10`.
 
-Show all ten rubric rows. Every row must include its individual numeric score and a short evidence note. Then show the raw subtotal, any applied cap, and the final total. Verify the arithmetic explicitly. Label the result **workshop quality score**, not a scientific benchmark.
+Show all ten rubric rows. Every row must include its individual numeric score and one short evidence note, followed by the final total. Do not print an arithmetic formula or explain safeguards that did not apply. If a safeguard changes the score, add one concise note naming the demonstrated critical failure. Label the result **workshop quality score**, not a scientific benchmark.
 
 ## Required Output
 
@@ -113,7 +115,7 @@ Then provide:
 | Production build verified | |
 | Lint verified | |
 
-After the table, include a compact model/session breakdown, confirmed verification results, and any limitations.
+After the table, include a compact model/session breakdown, a two-column verification summary (`Check | Result`), and up to five material limitations. Do not add a transcript-evidence column.
 
 Add a model workflow table:
 
@@ -149,8 +151,6 @@ Then include the complete scored rubric:
 | 8 | Regression safety | | |
 | 9 | Accessibility | | |
 | 10 | Maintainability | | |
-| | **Raw subtotal** | | |
-| | **Applied cap** | | |
 | | **Workshop quality score** | **X/10** | |
 
 Save each baseline report in both formats:
@@ -224,11 +224,9 @@ Finally, report every quality criterion for both runs rather than only the total
 | 8 | Regression safety | | | |
 | 9 | Accessibility | | | |
 | 10 | Maintainability | | | |
-| | **Raw subtotal** | | | |
-| | **Applied cap** | | | |
 | | **Workshop quality score** | | | |
 
-After this table, provide concise evidence notes for every baseline and enhanced criterion. If the saved baseline report lacks criterion-level scores or required fields, ask to regenerate it with the current skill instead of inventing values.
+After this table, provide at most one concise evidence sentence for each baseline and enhanced criterion. Do not include arithmetic formulas, transcript line references, or explanations of safeguards that did not apply. If the saved baseline report lacks criterion-level scores or required fields, ask to regenerate it with the current skill instead of inventing values.
 
 Save the final comparison in both formats using the same HTML requirements:
 
