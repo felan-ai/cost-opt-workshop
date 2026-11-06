@@ -16,7 +16,7 @@ Participants implement the same feature twice in the Storzy application: first w
 | `materials/pre-workshop-checklist.md` | Setup and readiness checks to complete before the event |
 | `materials/felan-workshop-flow.md` | Step-by-step Felan baseline and enhanced workflow |
 | `materials/implementation-task.md` | Exact feature prompt used for both runs |
-| `materials/manual-verification.md` | Six-check manual validation checklist |
+| `materials/manual-verification.md` | Five-check manual validation checklist |
 | `.agents/skills/cost-statistics/` | Cost and quality evaluation skill for Felan and Codex |
 | `.claude/skills/cost-statistics/` | Equivalent skill for Claude Code |
 | `workshop-results/` | Locally generated reports; created when needed and ignored by Git |
@@ -93,7 +93,7 @@ The final report compares observed statistics and workshop quality scores. It do
 
 ### 5. Manual verification
 
-Run the six checks in [`materials/manual-verification.md`](materials/manual-verification.md) and record the result separately from the LLM-applied quality score.
+Run the five checks in [`materials/manual-verification.md`](materials/manual-verification.md) and record the result separately from the LLM-applied quality score.
 
 ## Skill discovery
 

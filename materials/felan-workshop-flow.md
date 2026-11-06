@@ -43,13 +43,42 @@ Copy the complete contents of [`implementation-task.md`](implementation-task.md)
 
 Submit the prompt unchanged. Do not add implementation hints, acceptance criteria, workshop context, or instructions about cost measurement. The same prompt must be used for both the baseline and enhanced runs.
 
-## 4. Evaluate the baseline implementation
+## 4. Manually validate the baseline implementation
 
 Wait for the baseline agent to finish its implementation, review, corrections, and verification.
 
-### 4.1 Manually inspect the session data
+Start the application from the baseline worktree:
 
-Before leaving the implementation session, open the coding agent's native session or usage view. Use the corresponding console UI in Felan, Claude Code, or Codex.
+```bash
+cd path/to/cost-opt-workshop-baseline
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) and log in with username `test_user` and password `password`.
+
+Complete these five use cases:
+
+1. **Initial catalog:** confirm that the inventory initially displays all six products.
+2. **Search correctness:** search for `backpack` and confirm Explorer Backpack appears by name; then search for `migraine` and confirm Cozy Fleece Jacket appears by description.
+3. **URL persistence:** search for `flight`, confirm the query appears in the URL, reload the page, and confirm the search and results are preserved.
+4. **No results and clear:** search for `not-a-real-product`, confirm a useful no-results state appears, then clear the search and confirm all six products return and the query is removed from the URL.
+5. **Existing behavior:** search for a product, change the sort order, add a filtered product to the cart, and confirm sorting and cart behavior still work.
+
+Record the result:
+
+```text
+Manual verification: __/5 passed
+Notes:
+- ...
+```
+
+Stop the development server with `Ctrl+C`.
+
+## 5. Evaluate the baseline session
+
+### 5.1 Manually inspect the session data
+
+Open the completed implementation session's native session or usage view. Use the corresponding console UI in Felan, Claude Code, or Codex.
 
 Record or confirm the information the UI exposes:
 
@@ -65,7 +94,7 @@ Different agents expose different fields. Record unavailable values as `N/A`; do
 
 Record the root implementation session ID, then exit the implementation session.
 
-### 4.2 Generate the comprehensive report
+### 5.2 Generate the comprehensive report
 
 Use a fixed non-frontier evaluator configuration for both the baseline report and final comparison:
 
