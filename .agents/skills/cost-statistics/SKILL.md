@@ -25,9 +25,11 @@ Analyze a completed implementation session from a separate, read-only analyst se
    - recorded cost, model calls, tool calls, failed operations
    - human follow-up prompts or recorded approval answers
 8. Group usage by model and session. Confirm that all breakdowns sum to the reported totals.
-9. Summarize tests, typecheck, build, lint, browser checks, and other verification only when the transcript confirms them.
-10. Use the implementation session's recorded working directory—not the analyst session's directory—to inspect the final diff and relevant source files, then apply the quality rubric below. Cite concrete evidence for every score. If that worktree no longer exists, score only what transcript evidence demonstrates and state the limitation.
-11. Resolve the workshop repository root with `git rev-parse --show-toplevel`. Create `<repo-root>/workshop-results/` and save the report there. This report directory is the only allowed write location.
+9. Identify the model workflow in chronological order, including each model's role and thinking level when recorded. Do not infer thinking levels or phase boundaries that the transcript does not expose.
+10. Attribute cost to observed phases when transcript markers make the boundary clear: frontier planning/root work, delegated or handed-off implementation, and independent review. Use `N/A` rather than assigning cost from model names alone.
+11. Summarize tests, typecheck, build, lint, browser checks, and other verification only when the transcript confirms them. Report the final automated test result and passed-test count when available.
+12. Use the implementation session's recorded working directory—not the analyst session's directory—to inspect the final diff and relevant source files, then apply the quality rubric below. Cite concrete evidence for every score. If that worktree no longer exists, score only what transcript evidence demonstrates and state the limitation.
+13. Resolve the workshop repository root with `git rev-parse --show-toplevel`. Create `<repo-root>/workshop-results/` and save the report there. This report directory is the only allowed write location.
 
 ## Rules
 
@@ -62,7 +64,7 @@ Add the ten values for a score out of 10. Apply these caps after summing:
 - Material cart, sorting, or retry regression: maximum `5/10`.
 - Search terms or product content are exposed in operational logs: maximum `5/10`.
 
-Show the rubric table with a short evidence note for every row. Label the result **workshop quality score**, not a scientific benchmark.
+Show all ten rubric rows. Every row must include its individual numeric score and a short evidence note. Then show the raw subtotal, any applied cap, and the final total. Verify the arithmetic explicitly. Label the result **workshop quality score**, not a scientific benchmark.
 
 ## Required Output
 
@@ -83,16 +85,51 @@ Start with the session ID, task prompt excerpt, working directory, models, and i
 | Failed operations | |
 | Descendant sessions | |
 | Human interventions | |
+| Independent review | |
+| Final automated tests | |
+| Typecheck verified | |
+| Production build verified | |
+| Lint verified | |
 
 After the table, include a compact model/session breakdown, confirmed verification results, and any limitations.
 
-Then include:
+Add a model workflow table:
 
-```text
-Workshop quality score: X/10
-```
+| Run | Workflow |
+|---|---|
+| Current run | |
 
-followed by the scored rubric table.
+Describe the observed sequence, for example `Astra high planning → Luna medium implementation → Sol reviewer`. Use `N/A` for any unrecorded model role or thinking level.
+
+Add an observed cost breakdown:
+
+| Phase | API-equivalent cost |
+|---|---:|
+| Frontier planning/root work | |
+| Delegated or handed-off implementation | |
+| Independent review | |
+| Unclassified observed cost | |
+| **Total** | |
+
+The numeric phase rows must sum to the total. Put observed cost with no verifiable phase boundary under **Unclassified observed cost**. Use `N/A` only when the underlying cost itself is unavailable, and explain the limitation. Do not report estimated savings.
+
+Then include the complete scored rubric:
+
+| # | Criterion | Score | Evidence |
+|---:|---|---:|---|
+| 1 | Repository health | | |
+| 2 | Search correctness | | |
+| 3 | API safety and privacy | | |
+| 4 | URL behavior | | |
+| 5 | Request efficiency | | |
+| 6 | Race safety | | |
+| 7 | Empty and clear states | | |
+| 8 | Regression safety | | |
+| 9 | Accessibility | | |
+| 10 | Maintainability | | |
+| | **Raw subtotal** | | |
+| | **Applied cap** | | |
+| | **Workshop quality score** | **X/10** | |
 
 Save a baseline report as:
 
@@ -102,7 +139,7 @@ workshop-results/baseline-<session-id>.md
 
 For final comparison mode, ask for the enhanced session name or ID and the baseline report when either is missing. Analyze the enhanced session with the same rules, then add:
 
-| Metric | Baseline | Enhanced | Difference | Result |
+| Metric | Baseline | Enhanced | Difference | Winner/result |
 |---|---:|---:|---:|---|
 | API-equivalent cost | | | | |
 | Task elapsed time | | | | |
@@ -115,9 +152,51 @@ For final comparison mode, ask for the enhanced session name or ID and the basel
 | Failed operations | | | | |
 | Descendant sessions | | | | |
 | Human interventions | | | | |
+| Independent review | | | | |
+| Final automated tests | | | | Not directly comparable |
+| Typecheck verified | | | | |
+| Production build verified | | | | |
+| Lint verified | | | | |
 | Workshop quality score | | | | |
 
-Use observed values only. Calculate absolute and percentage differences when both values are available. Do not declare an overall winner; report cost, time, token usage, and quality as separate trade-offs.
+Use observed values only. Calculate absolute and percentage differences when both values are available. For cost, time, token, call, failure, and intervention metrics, lower wins. For verified checks and independent review, report which run demonstrated the evidence or `Tie`; do not imply that test counts alone measure quality. For quality score, higher wins. Do not declare an overall winner; report cost, time, token usage, verification, and quality as separate trade-offs.
+
+Add a two-run model workflow table:
+
+| Run | Workflow |
+|---|---|
+| Baseline | |
+| Enhanced | |
+
+Add a side-by-side observed cost breakdown:
+
+| Phase | Baseline | Enhanced |
+|---|---:|---:|
+| Frontier planning/root work | | |
+| Delegated or handed-off implementation | | |
+| Independent review | | |
+| Unclassified observed cost | | |
+| **Total** | | |
+
+Finally, report every quality criterion for both runs rather than only the totals:
+
+| # | Criterion | Baseline | Enhanced | Winner/result |
+|---:|---|---:|---:|---|
+| 1 | Repository health | | | |
+| 2 | Search correctness | | | |
+| 3 | API safety and privacy | | | |
+| 4 | URL behavior | | | |
+| 5 | Request efficiency | | | |
+| 6 | Race safety | | | |
+| 7 | Empty and clear states | | | |
+| 8 | Regression safety | | | |
+| 9 | Accessibility | | | |
+| 10 | Maintainability | | | |
+| | **Raw subtotal** | | | |
+| | **Applied cap** | | | |
+| | **Workshop quality score** | | | |
+
+After this table, provide concise evidence notes for every baseline and enhanced criterion. If the saved baseline report lacks criterion-level scores or required fields, ask to regenerate it with the current skill instead of inventing values.
 
 Save the final report as:
 
