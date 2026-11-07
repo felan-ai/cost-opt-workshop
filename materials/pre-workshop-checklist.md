@@ -208,26 +208,36 @@ The commands below are for macOS and Linux. Windows equivalents are noted where 
 
 The baseline runs with none of the optimization tools active. Earlier installs of these tools, or personal hooks that do the same job, would make the baseline look cheaper than it is.
 
-- [ ] **Claude Code:** confirm none of the tools is configured:
+- [ ] **Claude Code:** in a session, confirm none of the tools is configured:
+
+  | Command | Must not list |
+  |---|---|
+  | `/mcp` | `codebase-memory-mcp`, `markitdown` |
+  | `/hooks` | `rtk hook claude`, `codebase-memory-mcp hook-augment` |
+  | `/plugin` | Prewalk |
+  | `/agents` | `codebase-memory` agents |
+  | type `/codebase-memory` | the Codebase Memory skill as a suggestion |
+
+  Then confirm your global instructions do not load RTK or Codebase Memory. Instructions do not show up in any of the commands above:
 
   ```bash
-  claude mcp list                                   # no codebase-memory-mcp or markitdown
-  rtk init --show                                   # Hook: not found, RTK.md: not found
-  ls ~/.claude/agents ~/.claude/skills              # no codebase-memory entries
   grep -i -E "rtk|codebase-memory" ~/.claude/CLAUDE.md   # no output
   ```
 
-  In a Claude Code session, run `/plugin` and confirm Prewalk is not installed.
+- [ ] **Codex:** in a session, confirm none of the tools is configured:
 
-- [ ] **Codex:** confirm none of the tools is configured:
+  | Command | Must not list |
+  |---|---|
+  | `/mcp` | `codebase-memory-mcp`, `markitdown` |
+  | `/hooks` | RTK or Codebase Memory hooks |
+  | `/plugins` | Prewalk |
+  | `/skills`, if your Codex version has it | `codebase-memory` |
+
+  Then confirm your global instructions do not load RTK or Codebase Memory:
 
   ```bash
-  codex mcp list                                    # no codebase-memory-mcp or markitdown
-  grep -i -E "rtk|codebase-memory|markitdown|prewalk" ~/.codex/config.toml ~/.codex/AGENTS.md   # no output
-  ls ~/.codex/agents ~/.agents/skills ~/.codex/skills   # no codebase-memory entries
+  grep -i -E "rtk|codebase-memory" ~/.codex/AGENTS.md   # no output
   ```
-
-  In a Codex session, run `/plugins` and confirm Prewalk is not installed.
 
 - [ ] **Felan:** confirm the four `builtinExtensions` entries are set to `false`.
 

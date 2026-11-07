@@ -159,6 +159,8 @@ Turn it on:
 | Claude Code | `rtk init -g --auto-patch` |
 | Codex | `rtk init -g --codex` |
 
+**Codex:** answer yes if it asks to change a file. Then start a new session, open `/hooks`, and trust the RTK hook; Codex does not run new hooks until you do.
+
 Check: start a session, ask it to run `git status`, then confirm that `rtk gain --history` lists `rtk git status` with the current time.
 
 Exercise: _placeholder — prompt and task to be added._
