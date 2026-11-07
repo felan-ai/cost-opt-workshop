@@ -60,7 +60,7 @@ Commands that start with `/` are typed inside an agent session. All other comman
   pnpm lint
   ```
 
-  ESLint must be provided by the repository dependencies; a global installation should not be required. If the command reports that ESLint is missing, contact the facilitator rather than changing the workshop dependencies locally.
+  ESLint is provided by the repository dependencies; a global installation is not required. The prepared starting state may report existing warnings, but it must finish with zero lint errors and exit successfully. If ESLint is missing or the command reports errors, contact the facilitator rather than changing the workshop dependencies locally.
 
 - [ ] Run the production build and confirm it succeeds:
 
