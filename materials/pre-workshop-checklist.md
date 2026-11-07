@@ -156,6 +156,8 @@ The commands below are for macOS and Linux. Windows equivalents are noted where 
 
   Windows: `winget install astral-sh.uv`, then the same `uv tool install` command.
 
+  The first `markitdown-mcp --help` can take up to a minute before printing anything.
+
 - [ ] Confirm the project-local Manual Prewalk skill files are present:
 
   ```bash
