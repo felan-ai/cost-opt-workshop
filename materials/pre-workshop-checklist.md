@@ -4,8 +4,6 @@ Complete these steps before the workshop. Do not start the implementation task y
 
 This checklist is the same for Felan, Claude Code, and Codex. Steps that apply to only some agents are marked **Felan**, **Claude Code**, or **Codex**.
 
-Commands that start with `/` are typed inside an agent session. All other commands run in a terminal. In Claude Code you can also run a terminal command from the session by prefixing it with `!`, for example `! rtk --version`.
-
 ## Tools
 
 - [ ] Install Node.js 20.9.0 or later and confirm with `node --version`.
@@ -135,7 +133,7 @@ The commands below are for macOS and Linux. Windows equivalents are noted where 
 
   Windows: `winget install rtk-ai.rtk`
 
-- [ ] Install the Codebase Memory binary without its agent configuration and confirm it reports `0.12.1` or later:
+- [ ] Install the Codebase Memory binary without its agent configuration and confirm the command runs and reports a version. The workshop does not require a specific version:
 
   ```bash
   curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash -s -- --skip-config

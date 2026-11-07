@@ -2,8 +2,6 @@
 
 This flow is the same for Felan, Claude Code, and Codex. Steps that differ between agents are marked **Felan**, **Claude Code**, or **Codex**.
 
-Commands that start with `/` are typed inside an agent session. All other commands run in a terminal. In Claude Code you can also run a terminal command from the session by prefixing it with `!`, for example `! rtk gain --history`.
-
 The run order matters. The baseline runs first, while none of the optimization tools are active. The tools are then turned on one at a time in the extension exercises, and the enhanced run uses all of them. Do not turn on a tool before its exercise.
 
 | Run | Felan / Codex model | Claude Code model |
@@ -219,7 +217,7 @@ Turn it on:
 | Claude Code | `claude mcp add --scope user markitdown -- markitdown-mcp` |
 | Codex | `codex mcp add markitdown -- markitdown-mcp` |
 
-Check: `/mcp` (Claude Code) or `codex mcp list` (Codex) shows `markitdown`.
+Check: `/mcp` shows `markitdown`.
 
 Exercise: _placeholder — prompt and task to be added._
 
