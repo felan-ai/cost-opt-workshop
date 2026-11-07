@@ -180,10 +180,12 @@ The installer configures every coding agent it detects, so a Claude Code partici
 
 **Codex:** open `/hooks` in a new session and trust the Codebase Memory hooks. Codex does not run them until you do.
 
-Check:
+Check, in a new session:
 
-- **Claude Code:** `/mcp` shows `codebase-memory-mcp` connected, `/hooks` lists `codebase-memory-mcp hook-augment`, and `/agents` lists the `codebase-memory` agents.
-- **Codex:** `codex mcp list` shows `codebase-memory-mcp`.
+- **Claude Code:** `/mcp` shows `codebase-memory-mcp` connected, `/hooks` lists `codebase-memory-mcp hook-augment`, `/agents` lists the `codebase-memory` agents, and typing `/codebase-memory` suggests the Codebase Memory skill.
+- **Codex:** `/mcp` shows `codebase-memory-mcp`, and `/skills`, if your Codex version has it, lists `codebase-memory`.
+
+The first time the agent uses Codebase Memory in a repository, it builds the graph. This takes a moment and happens once; afterwards the graph updates automatically when files change.
 
 Exercise: _placeholder — prompt and task to be added._
 
