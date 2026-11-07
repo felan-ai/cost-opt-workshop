@@ -116,11 +116,13 @@ git worktree add ../cost-opt-workshop-enhanced -b workshop/enhanced main
 
 During the workshop, run implementation sessions from the corresponding worktree. Run evaluator sessions from the original `cost-opt-workshop` repository so all reports are saved together under `workshop-results/`.
 
-## Download the optimization tools
+## Prepare the optimization tools
 
 **Felan** participants can skip this section: the four tools are built into Felan and are turned on through its configuration during the workshop.
 
-**Claude Code and Codex:** download the four tools now, but do not configure them. A downloaded program does nothing until it is configured; configuration happens during the workshop, after the baseline run, and works offline. Downloading now catches network and install problems before the workshop.
+**Claude Code and Codex:** download RTK, Codebase Memory, and MarkItDown now, but do not configure them. A downloaded program does nothing until it is configured; configuration happens during the workshop, after the baseline run, and works offline. Downloading now catches network and install problems before the workshop.
+
+The workshop's manual Prewalk simulation is already included in the repository as an explicit-invocation skill. It does not require a plugin, marketplace, preset file, or separate installation.
 
 The commands below are for macOS and Linux. Windows equivalents are noted where they exist. Native Windows has not been tested for this workshop; WSL is recommended.
 
@@ -156,53 +158,14 @@ The commands below are for macOS and Linux. Windows equivalents are noted where 
 
   Windows: `winget install astral-sh.uv`, then the same `uv tool install` command.
 
-- [ ] Add the Prewalk plugin marketplace without installing the plugin:
-
-  **Claude Code**, in a session:
-
-  ```text
-  /plugin marketplace add TerenceLiu98/prewalk
-  ```
-
-  Run `/plugin marketplace list` and confirm `prewalk` is listed. Note the marketplace name it shows; the plugin is installed as `prewalk@<marketplace name>` during the workshop.
-
-  **Codex**, in a terminal:
+- [ ] Confirm the project-local Manual Prewalk skill files are present:
 
   ```bash
-  codex plugin marketplace add TerenceLiu98/prewalk
+  test -f .claude/skills/manual-prewalk/SKILL.md
+  test -f .agents/skills/manual-prewalk/SKILL.md
   ```
 
-- [ ] **Claude Code:** configure the model Prewalk hands off to after planning. Create `~/.claude/prewalk-presets.json`:
-
-  ```json
-  {
-    "default": "workshop",
-    "presets": {
-      "workshop": {
-        "description": "Workshop executor",
-        "executor": "sonnet",
-        "handoff_mode": "spawn",
-        "require_model_routing": true,
-        "max_todos": 12
-      }
-    }
-  }
-  ```
-
-- [ ] **Codex:** configure the model Prewalk hands off to after planning. Create `~/.codex/prewalk-presets.toml`:
-
-  ```toml
-  default_preset = "workshop"
-
-  [presets.workshop]
-  executor = "gpt-6-luna"
-  executor_effort = "medium"
-  handoff_mode = "spawn"
-  require_model_routing = true
-  max_todos = 12
-  ```
-
-  Only Prewalk reads these files, so they have no effect until Prewalk is installed.
+  Claude Code invokes it with `/manual-prewalk`; Codex invokes it with `$manual-prewalk`. The skill cannot activate automatically, and it must not be invoked during the baseline run.
 
 ## Confirm a clean starting state
 
@@ -214,7 +177,7 @@ The baseline runs with none of the optimization tools active. Earlier installs o
   |---|---|
   | `/mcp` | `codebase-memory-mcp`, `markitdown` |
   | `/hooks` | `rtk hook claude`, `codebase-memory-mcp hook-augment` |
-  | `/plugin` | Prewalk |
+  | `/plugin` | any separately installed third-party Prewalk plugin |
   | `/agents` | `codebase-memory` agents |
   | type `/codebase-memory` | the Codebase Memory skill as a suggestion |
 
@@ -230,7 +193,7 @@ The baseline runs with none of the optimization tools active. Earlier installs o
   |---|---|
   | `/mcp` | `codebase-memory-mcp`, `markitdown` |
   | `/hooks` | RTK or Codebase Memory hooks |
-  | `/plugins` | Prewalk |
+  | `/plugins` | any separately installed third-party Prewalk plugin |
   | `/skills`, if your Codex version has it | `codebase-memory` |
 
   Then confirm your global instructions do not load RTK or Codebase Memory:
@@ -241,7 +204,7 @@ The baseline runs with none of the optimization tools active. Earlier installs o
 
 - [ ] **Felan:** confirm the four `builtinExtensions` entries are set to `false`.
 
-- [ ] If any of the tools is already configured, remove it with the commands in the "After the workshop" section of [`workshop-flow.md`](workshop-flow.md) and repeat the check.
+- [ ] If RTK, Codebase Memory, MarkItDown, or a third-party Prewalk plugin is already configured, remove it with the commands in the "After the workshop" section of [`workshop-flow.md`](workshop-flow.md) and repeat the check. Do not remove the repository's `manual-prewalk` skill; leaving it installed does not affect the baseline because it allows only explicit invocation.
 
 - [ ] Review your personal agent configuration for hooks, plugins, or instructions that compress command output or add code context, such as other token-saving tools. Turn them off for the workshop. Hooks that do not change what the agent sees, such as status or notification hooks, can stay on.
 
@@ -249,6 +212,7 @@ The baseline runs with none of the optimization tools active. Earlier installs o
 
 - [ ] Start a fresh agent session from the repository root.
 - [ ] Confirm the `cost-statistics` skill is available.
+- [ ] Start a fresh Claude Code or Codex session from the enhanced worktree and confirm `manual-prewalk` is available. Do not invoke it yet.
 - [ ] Exit that session. Start a new session for the baseline implementation during the workshop.
 
 If any check fails, resolve it before the workshop (ask your agent for help) or send the failure details to the facilitator.
