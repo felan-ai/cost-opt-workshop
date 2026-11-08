@@ -189,19 +189,17 @@ Exercise: _placeholder — prompt and task to be added._
 
 ### 6.3 Prewalk
 
-Prewalk splits a task into a planning phase in the current session and an implementation phase handed off to a cheaper executor model.
+Prewalk separates planning from implementation so the implementation can continue on a cheaper executor model. Felan automates the transition; the Manual Prewalk skill pauses at a checkpoint so the user can switch models in the same root session.
 
-Turn it on:
+Felan provides Prewalk as a built-in extension. For Claude Code and Codex, the repository already includes the explicit-invocation `manual-prewalk` skill; it does not require a plugin, marketplace, installation, or configuration.
 
-| Agent | Command |
+| Agent | Preparation and invocation |
 |---|---|
 | Felan | `"prewalk": true` |
-| Claude Code | `/plugin install prewalk@prewalk` in a session |
-| Codex | `codex plugin add prewalk@prewalk-marketplace` in a terminal |
+| Claude Code | No setup. Invoke it with `/manual-prewalk <implementation task>`. |
+| Codex | No setup. Invoke it with `$manual-prewalk <implementation task>`. |
 
-If `/plugin marketplace list` showed a different marketplace name before the workshop, use `prewalk@<that name>`.
-
-Check: exit and start a new session, because a running session does not load a newly installed plugin. Then run `/prewalk:pw-doctor` (Claude Code) or `$prewalk:pw-doctor` (Codex).
+Check: start a fresh session from the enhanced worktree. Claude Code should suggest `/manual-prewalk`, and Codex should list `manual-prewalk` in `/skills` when that command is available. Do not invoke the skill until the exercise or enhanced implementation run.
 
 Exercise: _placeholder — prompt and task to be added._
 
@@ -244,7 +242,7 @@ Keep the same root model and thinking level used for the baseline so the impleme
 
 Exit any existing Felan session after changing the configuration.
 
-**Claude Code and Codex:** all four tools are already on from the exercises.
+**Claude Code and Codex:** RTK, Codebase Memory, and MarkItDown are configured from the exercises. Manual Prewalk is the project-local skill already included in the repository and runs only when explicitly invoked.
 
 ### 7.2 Start the enhanced implementation session
 
@@ -262,9 +260,17 @@ cd path/to/cost-opt-workshop-enhanced
 
 ### 7.3 Submit the same implementation task
 
-Copy the complete contents of [`implementation-task.md`](implementation-task.md) and submit them unchanged as the first user prompt.
+Use the complete contents of [`implementation-task.md`](implementation-task.md) without changing its task body:
 
-Do not add hints, workshop context, extension instructions, or measurement instructions to the task prompt. Wait for the root agent, implementation workers, reviewers, corrections, and verification to finish, then record the enhanced root session ID.
+| Agent | Submission |
+|---|---|
+| Felan | Paste the task as the first user prompt. The enabled built-in Prewalk extension manages the planning and executor handoff. |
+| Claude Code | Invoke `/manual-prewalk`, passing the complete task as its argument. |
+| Codex | Invoke `$manual-prewalk`, passing the complete task as its argument. |
+
+For Claude Code and Codex, wait for the `MANUAL PREWALK PAUSED` checkpoint, switch the same root session to the executor model listed at the top of this guide, then invoke `manual-prewalk` again with `resume`. Do not start a separate implementation session.
+
+Do not add hints, workshop context, acceptance criteria, or measurement instructions to the task body. Wait for the root agent, implementation work, review, corrections, and verification to finish, then record the enhanced root session ID.
 
 ### 7.4 Compare with the baseline
 
@@ -278,13 +284,13 @@ Use the cost-statistics skill to analyze enhanced session <ENHANCED_SESSION_ID> 
 
 ## After the workshop
 
-The tools stay configured after the workshop. To remove them:
+The configured tools stay active after the workshop. The project-local Manual Prewalk skill remains available but inactive unless invoked. To remove the configured tools:
 
 | Tool | Claude Code | Codex |
 |---|---|---|
 | RTK | `rtk init -g --uninstall` | `rtk init -g --codex --uninstall` |
 | Codebase Memory | `codebase-memory-mcp uninstall` (all agents) | same |
-| Prewalk | `/plugin uninstall prewalk@prewalk` | remove it through `/plugins` |
+| Manual Prewalk | No cleanup. The project-local skill is inactive unless explicitly invoked. | same |
 | MarkItDown | `claude mcp remove --scope user markitdown` | `codex mcp remove markitdown` |
 
 Codebase Memory's uninstaller can leave its skill folders behind. Check `~/.claude/skills`, `~/.agents/skills`, and `~/.codex/skills` for a `codebase-memory` folder and delete it if present.
