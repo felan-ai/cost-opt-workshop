@@ -210,6 +210,32 @@ The baseline runs with none of the optimization tools active. Earlier installs o
 
 ## Verify the coding agent
 
+- [ ] **Codex:** allow network access in the Codex sandbox, so the agent can run `pnpm build`. The build downloads the Geist fonts from Google Fonts, and the default sandbox blocks network access, so the build fails with `Failed to fetch Geist from Google Fonts` unless the agent asks for permission to run outside the sandbox.
+
+  Add this to `~/.codex/config.toml`:
+
+  ```toml
+  sandbox_mode = "workspace-write"
+
+  [sandbox_workspace_write]
+  network_access = true
+  ```
+
+  Or enable it for one launch only:
+
+  ```bash
+  codex -c 'sandbox_mode="workspace-write"' -c sandbox_workspace_write.network_access=true
+  ```
+
+  Both keys are needed; `network_access` on its own was ignored in our test. Confirm it works:
+
+  ```bash
+  codex sandbox -c 'sandbox_mode="workspace-write"' -c sandbox_workspace_write.network_access=true \
+    curl -sS -m 15 -o /dev/null -w '%{http_code}\n' 'https://fonts.googleapis.com/css2?family=Geist'
+  ```
+
+  The command should print `200`. Without the setting it fails with `Could not resolve host`. If it still fails (this is a known issue in some macOS and Codex app versions), run `pnpm build` yourself and approve any agent request to run it outside the sandbox.
+
 - [ ] Start a fresh agent session from the repository root.
 - [ ] Confirm the `cost-statistics` skill is available.
 - [ ] Start a fresh Claude Code or Codex session from the enhanced worktree and confirm `manual-prewalk` is available. Do not invoke it yet.

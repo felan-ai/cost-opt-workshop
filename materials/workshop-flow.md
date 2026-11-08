@@ -139,11 +139,11 @@ The evaluator reads the implementation session and its descendants, inspects the
 
 ## 6. Extension exercises
 
-Each exercise turns on one tool and tries it on its own. Tools stay on after their exercise, so all four are active by the final run. Run the exercises from the enhanced worktree, and start a new agent session after turning a tool on: running sessions do not pick up new hooks, MCP servers, or plugins.
+Each exercise turns on one tool and tries it on its own. Tools stay on after their exercise, so all four are active by the final run. Run the exercises from the enhanced worktree, and start a new agent session after turning a tool on: running sessions do not pick up new hooks, MCP servers, or newly discovered skills.
 
 **Felan:** turn each tool on by setting its `builtinExtensions` entry to `true`, then restart Felan.
 
-**Claude Code and Codex:** turn each tool on with the configure command in its exercise. The program was downloaded before the workshop, so this works offline.
+**Claude Code and Codex:** configure RTK, Codebase Memory, and MarkItDown with the command in each exercise. Manual Prewalk is already present as a project-local skill. The programs were downloaded before the workshop, so configuration works offline.
 
 ### 6.1 RTK
 
@@ -157,7 +157,7 @@ Turn it on:
 | Claude Code | `rtk init -g --auto-patch` |
 | Codex | `rtk init -g --codex` |
 
-**Codex:** answer yes if it asks to change a file. Then start a new session, open `/hooks`, and trust the RTK hook; Codex does not run new hooks until you do.
+**Codex:** answer yes if it asks to change a file. Then start a new session and open `/hooks`; Codex does not run new hooks until you trust them. Select `PreToolUse` — not `PostToolUse` or `PreModelRequest` — and press Enter. Find the entry with `Matcher: Bash` and `Command: rtk hook codex`. Confirm it is checked (`[x]`) and shows `Trust: Trusted`; otherwise use the action shown in that screen to enable and trust it.
 
 Check: start a session, ask it to run `git status`, then confirm that `rtk gain --history` lists `rtk git status` with the current time.
 
@@ -176,7 +176,12 @@ Turn it on:
 
 The installer configures every coding agent it detects, so a Claude Code participant's Codex setup changes too, and the other way round.
 
-**Codex:** open `/hooks` in a new session and trust the Codebase Memory hooks. Codex does not run them until you do.
+**Codex:** open `/hooks` in a new session and trust both Codebase Memory hooks; Codex does not run new hooks until you do:
+
+- Select `SessionStart`, press Enter, and find the entry with `Matcher: startup|resume|clear|compact` and a command ending in `codebase-memory-mcp hook-augment`.
+- Select `SubagentStart`, press Enter, and find the entry with `Matcher: *` and a command ending in `codebase-memory-mcp hook-augment`.
+
+Confirm both entries are checked (`[x]`) and show `Trust: Trusted`. The `PreToolUse` entry with `Matcher: Bash` is the RTK hook, not a Codebase Memory hook.
 
 Check, in a new session:
 
