@@ -300,4 +300,10 @@ The configured tools stay active after the workshop. The project-local Manual Pr
 
 Codebase Memory's uninstaller can leave its skill folders behind. Check `~/.claude/skills`, `~/.agents/skills`, and `~/.codex/skills` for a `codebase-memory` folder and delete it if present.
 
+After removing the MarkItDown MCP configuration from every agent that used it, uninstall the shared server binary once:
+
+```bash
+uv tool uninstall markitdown-mcp
+```
+
 **Felan:** set the extensions back to the values you want.
