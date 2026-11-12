@@ -46,7 +46,7 @@ This checklist is the same for Felan, Claude Code, and Codex. Steps that apply t
 
 ## Verify the starting state
 
-- [ ] Run the automated tests and confirm all 21 tests pass:
+- [ ] Run the automated tests and confirm all 28 tests pass:
 
   ```bash
   pnpm test

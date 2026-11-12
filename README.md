@@ -115,7 +115,7 @@ pnpm lint
 pnpm build
 ```
 
-The prepared starting state has 21 automated tests. A production build should complete successfully before beginning the exercise.
+The prepared starting state has 28 automated tests. A production build should complete successfully before beginning the exercise.
 
 ## Environment variables
 
