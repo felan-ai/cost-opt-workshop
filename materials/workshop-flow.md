@@ -435,6 +435,22 @@ The answers:
 
 What to notice: Storzy is small, so a few searches and reads are already cheap, and the Codebase Memory tool definitions sit in the context of every call. A small or even negative saving is a valid result. Codebase Memory pays off on larger, less familiar repositories, where the agent would otherwise read many files to answer the same question.
 
+#### Optional: see the graph in CBM Lens
+
+CBM Lens is Codebase Memory's browser UI, in open beta. It is included in the standard install from the pre-workshop checklist; Nix and source builds can come without it. Start it after the project is indexed:
+
+```bash
+codebase-memory-mcp daemon start --open --port=9749
+```
+
+If the browser does not open, go to http://127.0.0.1:9749. The map shows folders and files, Galaxy shows symbols and their call paths in 3D, and Explore shows the source next to each file's dependencies.
+
+The command starts a background daemon. While it runs, it keeps watching indexed projects and re-indexes them when files change, even after every agent session has closed. Stop it when you are done:
+
+```bash
+codebase-memory-mcp daemon stop
+```
+
 ## 7. Run the final task with all tools on
 
 ### 7.1 Configure the enhanced agent
@@ -509,7 +525,7 @@ The configured tools stay active after the workshop. The project-local Manual Pr
 | Manual Prewalk | No cleanup. The project-local skill is inactive unless explicitly invoked. | same |
 | MarkItDown | `claude mcp remove --scope user markitdown` | `codex mcp remove markitdown` |
 
-Codebase Memory's uninstaller can leave its skill folders behind. Check `~/.claude/skills`, `~/.agents/skills`, and `~/.codex/skills` for a `codebase-memory` folder and delete it if present.
+If you started the CBM Lens daemon, stop it first with `codebase-memory-mcp daemon stop`. Codebase Memory's uninstaller can leave its skill folders behind. Check `~/.claude/skills`, `~/.agents/skills`, and `~/.codex/skills` for a `codebase-memory` folder and delete it if present.
 
 After removing the MarkItDown MCP configuration from every agent that used it, uninstall the shared server binary once:
 
