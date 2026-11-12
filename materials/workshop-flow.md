@@ -7,7 +7,7 @@ The run order matters. The baseline runs first, while none of the optimization t
 | Run | Felan / Codex model | Claude Code model |
 |---|---|---|
 | Baseline and enhanced implementation | `gpt-6-astra`, thinking `high` | `claude-opus-5-5`, effort `high` |
-| Prewalk executor (enhanced run, after planning) | Codex: `gpt-6-luna`, effort `medium` | `sonnet` |
+| Prewalk executor (Prewalk demo, and the enhanced run after planning) | `gpt-6-luna`, thinking `medium` | `sonnet` |
 | Evaluator | `gpt-6.1-sol`, thinking `medium` | `claude-sonnet-5-5`, effort `medium` |
 
 ## 1. Configure the baseline agent
@@ -159,9 +159,53 @@ Turn it on:
 
 **Codex:** answer yes if it asks to change a file. Then start a new session and open `/hooks`; Codex does not run new hooks until you trust them. Select `PreToolUse` — not `PostToolUse` or `PreModelRequest` — and press Enter. Find the entry with `Matcher: Bash` and `Command: rtk hook codex`. Confirm it is checked (`[x]`) and shows `Trust: Trusted`; otherwise use the action shown in that screen to enable and trust it.
 
-Check: start a session, ask it to run `git status`, then confirm that `rtk gain --history` lists `rtk git status` with the current time.
+#### Exercise: see what RTK removes
 
-Exercise: _placeholder — prompt and task to be added._
+The presenter shows each step first, then participants repeat it.
+
+1. Before you turn RTK on, give `git status` something to report. In the enhanced worktree, run:
+
+   ```bash
+   echo "" >> README.md
+   touch rtk-scratch-1.txt rtk-scratch-2.txt
+   ```
+
+2. Compare the two outputs in your terminal, not in the agent:
+
+   ```bash
+   git status
+   rtk git status
+   ```
+
+   Both list the same changes. The RTK version drops the hints such as `(use "git add <file>..." to update what will be committed)`. That shorter text is what the agent would read.
+
+3. Turn RTK on with the command from the table above. **Codex:** trust the hook as described above.
+
+4. Start a new agent session and send:
+
+   ```text
+   Run git status and tell me which files changed.
+   ```
+
+   The agent types `git status`. The hook runs `rtk git status` instead, so the agent gets the short version.
+
+5. Show the savings:
+
+   ```bash
+   rtk gain --history
+   ```
+
+   It lists `rtk git status` with the current time and the tokens it saved.
+
+6. Undo the scratch changes:
+
+   ```bash
+   git checkout -- README.md
+   rm rtk-scratch-1.txt rtk-scratch-2.txt
+   git status --short   # no output
+   ```
+
+What to notice: the agent never asked for RTK. The hook changed the command, and the agent read the shorter output without knowing.
 
 ### 6.2 Codebase Memory
 
@@ -204,11 +248,128 @@ Felan provides Prewalk as a built-in extension. For Claude Code and Codex, the r
 | Claude Code | No setup. Invoke it with `/manual-prewalk <implementation task>`. |
 | Codex | No setup. Invoke it with `$manual-prewalk <implementation task>`. |
 
-Check: start a fresh session from the enhanced worktree. Claude Code should suggest `/manual-prewalk`, and Codex should list `manual-prewalk` in `/skills` when that command is available. Do not invoke the skill until the exercise or enhanced implementation run.
+Check: start a fresh session from the enhanced worktree. Claude Code should suggest `/manual-prewalk`, and Codex should list `manual-prewalk` in `/skills` when that command is available. Do not invoke the skill until the enhanced implementation run.
 
-Exercise: _placeholder — prompt and task to be added._
+#### Exercise: Prewalk by hand on a small bug
 
-### 6.4 MarkItDown
+This exercise runs Prewalk with plain prompts, so it works the same way in every agent. It uses a small bug instead of the full task to save time, and it is not measured.
+
+**Felan:** run this exercise before you set `"prewalk": true`, so the built-in extension does not take over. Turn it on after the exercise.
+
+The bug: the payment form accepts the demo card only in one exact format. A card number typed with dashes, or an expiration with spaces around the slash, is rejected.
+
+1. Start a fresh session from the enhanced worktree on the implementation model from the table at the top of this guide.
+
+2. Send the planning prompt. The model explores, writes a short todo list, makes the first edit, and stops:
+
+   ```text
+   Plan this fix before you change any code. Explore the relevant code and tests, then write a todo list of at most five items, each with a check that proves it works. Make item 1 a small real code change that sets the direction, complete it, and run its check. Then stop and wait. Do not start item 2.
+
+   The payment form rejects the demo card when the card number is typed with dashes, such as 4111-1111-1111-1111, or when the expiration has spaces around the slash, such as 12 / 34. Accept both formats. Keep the existing error messages for wrong values.
+   ```
+
+3. When the model stops after item 1, switch the same session to the Prewalk executor model from the table with `/model`. Do not start a new session.
+
+4. Send the executor prompt:
+
+   ```text
+   Continue the task. Complete the remaining todo items in order and run each item's check before you move on. Do not repeat the exploration or redo item 1. When you finish, run pnpm test and pnpm lint, then list the changed files and the results.
+   ```
+
+5. Review the change in a fresh context. Start a second session from the same worktree on the implementation model, and send:
+
+   ```text
+   Review the uncommitted changes in this repository. You did not write them. The task was: the payment form rejects the demo card when the card number is typed with dashes, such as 4111-1111-1111-1111, or when the expiration has spaces around the slash, such as 12 / 34. Accept both formats, and keep the existing error messages for wrong values.
+
+   Check that the change does this and does not break other checkout behavior. Run the relevant tests. List each problem with the file, the evidence, and a suggested fix. Do not edit files.
+   ```
+
+6. If the reviewer lists problems, return to the first session, which is still on the executor model, and send:
+
+   ```text
+   A reviewer found these problems. Fix them, then rerun pnpm test and pnpm lint:
+
+   <paste the reviewer's findings>
+   ```
+
+7. Set the demo changes aside so the enhanced run starts from a clean worktree:
+
+   ```bash
+   git stash push --include-untracked -m prewalk-demo
+   git status --short   # no output
+   ```
+
+What to notice: the frontier model only explored and made one edit. The cheaper model did the rest of the work with the files, test output, and todo list already in context. The planning prompt stays in the context after the switch, because a prompt cannot remove an earlier prompt. Felan's built-in Prewalk removes it.
+
+### 6.4 Long sessions: context and compaction
+
+This section does not turn on a tool. It shows where each agent reports how full the context is, when it compacts on its own, and how to compact or start fresh by hand. The presenter shows each step first, then participants repeat it.
+
+Use the first session from the Prewalk exercise, the one that switched to the executor model, so there is real history to compact. If you closed it, reopen it with `/resume`. Compaction changes only the session context, not files, so the stashed demo changes do not matter here.
+
+Undo every setting you change in this section before the final run (step 6), so the enhanced run compacts the same way as the baseline.
+
+1. Check how full the context is.
+
+   | Agent | Where to look |
+   |---|---|
+   | Claude Code | `/context` shows usage by category. |
+   | Codex | The footer shows `N% context left`. `/status` shows the session's token usage. |
+   | Felan | The footer shows the context percentage. `/context` shows usage by category and the free space. |
+
+2. See when automatic compaction runs, and move it earlier.
+
+   | Agent | Default | Compact earlier |
+   |---|---|---|
+   | Claude Code | Close to the model's context window. `/autocompact` without a value shows the current window. | `/autocompact 200k` saves the window for the current model in your user settings. `claude --autocompact 200k` uses it for one launch without saving it. |
+   | Codex | At 90% of the model's context window. | Add `model_auto_compact_token_limit = 200000` to `~/.codex/config.toml`, or start with `codex -c model_auto_compact_token_limit=200000` for one launch. The setting can lower the limit, but never above 90% of the window. |
+   | Felan | When the context comes within 16,384 tokens of the window. | Add `"compaction": { "enabled": true, "reserveTokens": <tokens> }` to `~/.felan/settings.json`, then restart Felan. The reserve is the gap left below the window, so a larger value compacts earlier: on a 400,000-token window, `200000` compacts at about 200,000 tokens. Read the window from `/context` first. A reserve close to the window makes Felan compact after every turn. |
+
+   Felan also compacts on its own shortly before a known prompt-cache expiry, when the session is idle and the context has at least 200,000 tokens. Set `extensionConfig.sessionCompaction.compactBeforeCacheExpiry` to `false` to turn this off.
+
+3. Compact now. Claude Code and Felan accept a focus that tells the summary what to keep:
+
+   ```text
+   /compact Keep the bug, the files you changed, the last test command and its exact result, the reviewer's findings, and what is left to do.
+   ```
+
+   **Codex:** run `/compact` without text. It does not accept a focus.
+
+   Then check the context again as in step 1. Usage should be lower.
+
+4. Check what survived. Send:
+
+   ```text
+   Without reading files or running commands, list the bug, the files you changed, the last test command and its exact result, any open reviewer findings, and what is left to do.
+   ```
+
+   Compare the answer with the session history above the compaction. Look for an exact error that became vague, a missing constraint, or a claim that tests pass with no test run behind it.
+
+5. Start fresh. To carry the work over, first ask for a handoff, check it, and keep a copy:
+
+   ```text
+   Write a handoff for a new session that will continue this task. Include the goal, constraints, decisions and rejected approaches, changed files, the last test command and its exact result, and the next step. Print it here. Do not write a file.
+   ```
+
+   Then start a new session and paste the handoff as the first prompt:
+
+   | Agent | Command |
+   |---|---|
+   | Claude Code | `/clear`. The previous conversation stays available in `/resume`. |
+   | Codex | `/new` or `/clear` |
+   | Felan | `/new` |
+
+6. Undo the settings from step 2:
+
+   | Agent | Undo |
+   |---|---|
+   | Claude Code | `/autocompact auto`. Nothing to undo if you used `--autocompact`. |
+   | Codex | Remove `model_auto_compact_token_limit` from `~/.codex/config.toml`. Nothing to undo if you used `-c`. |
+   | Felan | Restore `compaction.reserveTokens` in `~/.felan/settings.json` to its previous value, or remove it if you added it, then restart Felan. |
+
+What to notice: all three agents compact on their own only when the context is close to full, long after context rot starts. Checking the context and compacting between phases is up to you.
+
+### 6.5 MarkItDown
 
 MarkItDown converts documents such as PDF, Word, and Excel files into Markdown the agent can read.
 
@@ -220,9 +381,29 @@ Turn it on:
 | Claude Code | `claude mcp add --scope user markitdown -- markitdown-mcp` |
 | Codex | `codex mcp add markitdown -- markitdown-mcp` |
 
-Check: `/mcp` shows `markitdown`.
+Check: `/mcp` shows `markitdown`. **Felan:** `/markitdown` shows the status.
 
-Exercise: _placeholder — prompt and task to be added._
+#### Exercise: read a Word file with and without MarkItDown
+
+The presenter shows each step first, then participants repeat it. The document is `materials/agent-reading-test.docx`. It hides five facts with known answers, from the first section to the last word, so you can tell whether the agent read all of it.
+
+1. Before you turn MarkItDown on, start a new session in the enhanced worktree and send:
+
+   ```text
+   Read materials/agent-reading-test.docx. What is the verification code word, who is the project lead, what is the total order value, when must the results be archived, and what is the last word of the document?
+   ```
+
+   Watch how the agent gets at the text. Claude Code's Read refuses binary Office files, so expect it to unzip the file or write a script, often over several turns. Then check `/context` (the footer or `/status` in Codex) and note the number.
+
+2. Turn MarkItDown on with the command from the table above, and start a new session.
+
+3. Send the same prompt. **Claude Code and Codex:** the agent has to choose the `convert_to_markdown` tool. If it reaches for a shell command instead, add `Use the markitdown tool.` to the prompt. **Felan:** the ordinary read converts the file on its own.
+
+4. Check `/context` again and compare it with step 1. Compare the number of tool calls too.
+
+The answers: `AMBER-FALCON-72`, Dr. Lorena Ipsova, EUR 6,543.50, 15 December 2026, and `pineapple`.
+
+What to notice: the saving comes from the agent reaching a reader on the first try, not from a smaller document. A Word file is a zip of XML, so without a converter every agent improvises. MarkItDown reads only text, so a scanned page or a picture of a chart still needs the page image.
 
 ## 7. Run the final task with all tools on
 
