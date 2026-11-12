@@ -212,7 +212,7 @@ What to notice: the frontier model only explored and made one edit. The cheaper 
 
 ### 6.2 Long sessions: context and compaction
 
-This section does not turn on a tool. It shows where each agent reports how full the context is, when it compacts on its own, and how to compact or start fresh by hand. The presenter shows each step first, then participants repeat it.
+This section does not turn on a tool. It shows where each agent reports how full the context is, when it compacts on its own, and how to compact or start fresh by hand.
 
 Use the first session from the Prewalk exercise, the one that switched to the executor model, so there is real history to compact. If you closed it, reopen it with `/resume`. Compaction changes only the session context, not files, so the stashed demo changes do not matter here.
 
@@ -294,8 +294,6 @@ Turn it on:
 
 #### Exercise: see what RTK removes
 
-The presenter shows each step first, then participants repeat it.
-
 1. Before you turn RTK on, give `git status` something to report. In the enhanced worktree, run:
 
    ```bash
@@ -356,7 +354,7 @@ Check: `/mcp` shows `markitdown`. **Felan:** `/markitdown` shows the status.
 
 #### Exercise: read a Word file with and without MarkItDown
 
-The presenter shows each step first, then participants repeat it. The document is `materials/agent-reading-test.docx`. It hides five facts with known answers, from the first section to the last word, so you can tell whether the agent read all of it.
+The document is `materials/agent-reading-test.docx`. It hides five facts with known answers, from the first section to the last word, so you can tell whether the agent read all of it.
 
 1. Before you turn MarkItDown on, start a new session in the enhanced worktree and send:
 
@@ -380,30 +378,62 @@ What to notice: the saving comes from the agent reaching a reader on the first t
 
 Codebase Memory builds a graph of the repository so the agent can answer structural questions, such as who calls a function, without reading many files.
 
-Turn it on:
+#### Exercise: ask a structural question with and without Codebase Memory
 
-| Agent | Command |
-|---|---|
-| Felan | `"codebaseMemory": true` |
-| Claude Code and Codex | `codebase-memory-mcp install -y` |
+The question only reads code, so it is fast and changes nothing. It asks for the lookups Codebase Memory is built for: a call trace, a list of callers, and test coverage. Use the same model for both sessions.
 
-The installer configures every coding agent it detects, so a Claude Code participant's Codex setup changes too, and the other way round.
+1. Ask the question without Codebase Memory. Start a new session in the enhanced worktree and send:
 
-**Codex:** open `/hooks` in a new session and trust both Codebase Memory hooks; Codex does not run new hooks until you do:
+   ```text
+   Answer without changing any files. I am about to add product search to the catalog API and need to know the conventions it must follow.
 
-- Select `SessionStart`, press Enter, and find the entry with `Matcher: startup|resume|clear|compact` and a command ending in `codebase-memory-mcp hook-augment`.
-- Select `SubagentStart`, press Enter, and find the entry with `Matcher: *` and a command ending in `codebase-memory-mcp hook-augment`.
+   1. Trace how the inventory page loads products: each function from the page to the API route and back, with file paths, in call order.
+   2. List every call to emitOperationalLog with file:line and the event name it logs.
+   3. What does GET /api/products do today when the request has query parameters?
+   4. Which test files cover the catalog API and operational logging?
 
-Confirm both entries are checked (`[x]`) and show `Trust: Trusted`. The `PreToolUse` entry with `Matcher: Bash` is the RTK hook, not a Codebase Memory hook.
+   Answer in at most 250 words.
+   ```
 
-Check, in a new session:
+   Watch how the agent explores: how many searches and file reads it makes. Then check `/context` (the footer or `/status` in Codex), note the number, record the session ID, and exit the session.
 
-- **Claude Code:** `/mcp` shows `codebase-memory-mcp` connected, `/hooks` lists `codebase-memory-mcp hook-augment`, `/agents` lists the `codebase-memory` agents, and typing `/codebase-memory` suggests the Codebase Memory skill.
-- **Codex:** `/mcp` shows `codebase-memory-mcp`, and `/skills`, if your Codex version has it, lists `codebase-memory`.
+2. Install Codebase Memory:
 
-The first time the agent uses Codebase Memory in a repository, it builds the graph. This takes a moment and happens once; afterwards the graph updates automatically when files change.
+   | Agent | Command |
+   |---|---|
+   | Felan | `"codebaseMemory": true` in `builtinExtensions`, then restart Felan |
+   | Claude Code and Codex | `codebase-memory-mcp install -y` |
 
-Exercise: _placeholder — prompt and task to be added._
+   The installer configures every coding agent it detects, so a Claude Code participant's Codex setup changes too, and the other way round.
+
+   **Codex:** when Codex asks about the new hooks after installation, reply trust all hooks. Codex does not run new hooks until they are trusted. This trusts the two Codebase Memory hooks, both of which run `codebase-memory-mcp hook-augment`:
+
+   - `SessionStart` with `Matcher: startup|resume|clear|compact`, which adds graph context when a session starts, resumes, clears, or compacts.
+   - `SubagentStart` with `Matcher: *`, which adds graph context when a subagent starts.
+
+   To check them later, open `/hooks`: both entries show `[x]` and `Trust: Trusted`.
+
+3. Index the project. Start a new session in the enhanced worktree and check that Codebase Memory is connected:
+
+   - **Claude Code:** `/mcp` shows `codebase-memory-mcp` connected, `/hooks` lists `codebase-memory-mcp hook-augment`, `/agents` lists the `codebase-memory` agents, and typing `/codebase-memory` suggests the Codebase Memory skill.
+   - **Codex:** `/mcp` shows `codebase-memory-mcp`, and `/skills`, if your Codex version has it, lists `codebase-memory`.
+
+   Then send `Index this project`. Building the graph takes a moment and happens once; afterwards the graph updates automatically when files change. Doing it in this session keeps the one-time build out of the session you measure. Exit the session when indexing is done.
+
+4. Ask the same question with Codebase Memory. Start a new session and send the same prompt as in step 1. Watch which Codebase Memory tools the agent calls, such as `trace_path` or `search_graph`, and how many files it still reads.
+
+5. Check `/context` again and compare it with step 1. Compare the number of tool calls too. For exact token and cost numbers, generate a cost-statistics report for each of the two sessions from the evaluator session, as in step 5.2.
+
+6. Check both answers against the answer key below.
+
+The answers:
+
+1. `app/inventory/page.tsx`: `loadProducts` calls `fetch("/api/products")`. `GET` in `app/api/products/route.ts` returns `PRODUCTS` from `lib/products.ts` and logs the request. Back in the page, `parseCatalogResponse` in `lib/catalog.ts` validates the body, then `setProducts` stores the products; on failure the page sets `catalogError`.
+2. Five calls: `app/api/products/route.ts:40` logs `catalog.retrieval.completed`; `app/api/checkout/route.ts:55` and `:68` log `payment.authorization.completed`; `app/api/checkout/route.ts:101` logs `checkout.request.completed`; `app/api/login/route.ts:54` logs `authentication.completed`. The function is defined in `lib/app-logger.ts:109`.
+3. Any query string is rejected with status 400, outcome `invalid_request`, and the body `"Invalid catalog request."`. The request is still logged.
+4. `lib/catalog-api.test.ts` and `lib/catalog-api-guardrails.test.ts` for the catalog API; `lib/app-logger.test.ts` and `lib/app-logger-configured.test.ts` for logging.
+
+What to notice: Storzy is small, so a few searches and reads are already cheap, and the Codebase Memory tool definitions sit in the context of every call. A small or even negative saving is a valid result. Codebase Memory pays off on larger, less familiar repositories, where the agent would otherwise read many files to answer the same question.
 
 ## 7. Run the final task with all tools on
 
