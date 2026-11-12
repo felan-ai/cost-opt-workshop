@@ -145,98 +145,7 @@ Each exercise turns on one tool and tries it on its own. Tools stay on after the
 
 **Claude Code and Codex:** configure RTK, Codebase Memory, and MarkItDown with the command in each exercise. Manual Prewalk is already present as a project-local skill. The programs were downloaded before the workshop, so configuration works offline.
 
-### 6.1 RTK
-
-RTK rewrites shell commands such as `git status` into `rtk git status`, which returns shorter output.
-
-Turn it on:
-
-| Agent | Command |
-|---|---|
-| Felan | `"rtkOptimizer": true` |
-| Claude Code | `rtk init -g --auto-patch` |
-| Codex | `rtk init -g --codex` |
-
-**Codex:** answer yes if it asks to change a file. Then start a new session and open `/hooks`; Codex does not run new hooks until you trust them. Select `PreToolUse` — not `PostToolUse` or `PreModelRequest` — and press Enter. Find the entry with `Matcher: Bash` and `Command: rtk hook codex`. Confirm it is checked (`[x]`) and shows `Trust: Trusted`; otherwise use the action shown in that screen to enable and trust it.
-
-#### Exercise: see what RTK removes
-
-The presenter shows each step first, then participants repeat it.
-
-1. Before you turn RTK on, give `git status` something to report. In the enhanced worktree, run:
-
-   ```bash
-   echo "" >> README.md
-   touch rtk-scratch-1.txt rtk-scratch-2.txt
-   ```
-
-2. Compare the two outputs in your terminal, not in the agent:
-
-   ```bash
-   git status
-   rtk git status
-   ```
-
-   Both list the same changes. The RTK version drops the hints such as `(use "git add <file>..." to update what will be committed)`. That shorter text is what the agent would read.
-
-3. Turn RTK on with the command from the table above. **Codex:** trust the hook as described above.
-
-4. Start a new agent session and send:
-
-   ```text
-   Run git status and tell me which files changed.
-   ```
-
-   The agent types `git status`. The hook runs `rtk git status` instead, so the agent gets the short version.
-
-5. Show the savings:
-
-   ```bash
-   rtk gain --history
-   ```
-
-   It lists `rtk git status` with the current time and the tokens it saved.
-
-6. Undo the scratch changes:
-
-   ```bash
-   git checkout -- README.md
-   rm rtk-scratch-1.txt rtk-scratch-2.txt
-   git status --short   # no output
-   ```
-
-What to notice: the agent never asked for RTK. The hook changed the command, and the agent read the shorter output without knowing.
-
-### 6.2 Codebase Memory
-
-Codebase Memory builds a graph of the repository so the agent can answer structural questions, such as who calls a function, without reading many files.
-
-Turn it on:
-
-| Agent | Command |
-|---|---|
-| Felan | `"codebaseMemory": true` |
-| Claude Code and Codex | `codebase-memory-mcp install -y` |
-
-The installer configures every coding agent it detects, so a Claude Code participant's Codex setup changes too, and the other way round.
-
-**Codex:** open `/hooks` in a new session and trust both Codebase Memory hooks; Codex does not run new hooks until you do:
-
-- Select `SessionStart`, press Enter, and find the entry with `Matcher: startup|resume|clear|compact` and a command ending in `codebase-memory-mcp hook-augment`.
-- Select `SubagentStart`, press Enter, and find the entry with `Matcher: *` and a command ending in `codebase-memory-mcp hook-augment`.
-
-Confirm both entries are checked (`[x]`) and show `Trust: Trusted`. The `PreToolUse` entry with `Matcher: Bash` is the RTK hook, not a Codebase Memory hook.
-
-Check, in a new session:
-
-- **Claude Code:** `/mcp` shows `codebase-memory-mcp` connected, `/hooks` lists `codebase-memory-mcp hook-augment`, `/agents` lists the `codebase-memory` agents, and typing `/codebase-memory` suggests the Codebase Memory skill.
-- **Codex:** `/mcp` shows `codebase-memory-mcp`, and `/skills`, if your Codex version has it, lists `codebase-memory`.
-
-The first time the agent uses Codebase Memory in a repository, it builds the graph. This takes a moment and happens once; afterwards the graph updates automatically when files change.
-
-Exercise: _placeholder — prompt and task to be added._
-
-### 6.3 Prewalk
+### 6.1 Prewalk
 
 Prewalk separates planning from implementation so the implementation can continue on a cheaper executor model. Felan automates the transition; the Manual Prewalk skill pauses at a checkpoint so the user can switch models in the same root session.
 
@@ -301,7 +210,7 @@ The bug: the payment form accepts the demo card only in one exact format. A card
 
 What to notice: the frontier model only explored and made one edit. The cheaper model did the rest of the work with the files, test output, and todo list already in context. The planning prompt stays in the context after the switch, because a prompt cannot remove an earlier prompt. Felan's built-in Prewalk removes it.
 
-### 6.4 Long sessions: context and compaction
+### 6.2 Long sessions: context and compaction
 
 This section does not turn on a tool. It shows where each agent reports how full the context is, when it compacts on its own, and how to compact or start fresh by hand. The presenter shows each step first, then participants repeat it.
 
@@ -369,7 +278,69 @@ Undo every setting you change in this section before the final run (step 6), so 
 
 What to notice: all three agents compact on their own only when the context is close to full, long after context rot starts. Checking the context and compacting between phases is up to you.
 
-### 6.5 MarkItDown
+### 6.3 RTK
+
+RTK rewrites shell commands such as `git status` into `rtk git status`, which returns shorter output.
+
+Turn it on:
+
+| Agent | Command |
+|---|---|
+| Felan | `"rtkOptimizer": true` |
+| Claude Code | `rtk init -g --auto-patch` |
+| Codex | `rtk init -g --codex` |
+
+**Codex:** answer yes if it asks to change a file. Then start a new session and open `/hooks`; Codex does not run new hooks until you trust them. Select `PreToolUse` — not `PostToolUse` or `PreModelRequest` — and press Enter. Find the entry with `Matcher: Bash` and `Command: rtk hook codex`. Confirm it is checked (`[x]`) and shows `Trust: Trusted`; otherwise use the action shown in that screen to enable and trust it.
+
+#### Exercise: see what RTK removes
+
+The presenter shows each step first, then participants repeat it.
+
+1. Before you turn RTK on, give `git status` something to report. In the enhanced worktree, run:
+
+   ```bash
+   echo "" >> README.md
+   touch rtk-scratch-1.txt rtk-scratch-2.txt
+   ```
+
+2. Compare the two outputs in your terminal, not in the agent:
+
+   ```bash
+   git status
+   rtk git status
+   ```
+
+   Both list the same changes. The RTK version drops the hints such as `(use "git add <file>..." to update what will be committed)`. That shorter text is what the agent would read.
+
+3. Turn RTK on with the command from the table above. **Codex:** trust the hook as described above.
+
+4. Start a new agent session and send:
+
+   ```text
+   Run git status and tell me which files changed.
+   ```
+
+   The agent types `git status`. The hook runs `rtk git status` instead, so the agent gets the short version.
+
+5. Show the savings:
+
+   ```bash
+   rtk gain --history
+   ```
+
+   It lists `rtk git status` with the current time and the tokens it saved.
+
+6. Undo the scratch changes:
+
+   ```bash
+   git checkout -- README.md
+   rm rtk-scratch-1.txt rtk-scratch-2.txt
+   git status --short   # no output
+   ```
+
+What to notice: the agent never asked for RTK. The hook changed the command, and the agent read the shorter output without knowing.
+
+### 6.4 MarkItDown
 
 MarkItDown converts documents such as PDF, Word, and Excel files into Markdown the agent can read.
 
@@ -404,6 +375,35 @@ The presenter shows each step first, then participants repeat it. The document i
 The answers: `AMBER-FALCON-72`, Dr. Lorena Ipsova, EUR 6,543.50, 15 December 2026, and `pineapple`.
 
 What to notice: the saving comes from the agent reaching a reader on the first try, not from a smaller document. A Word file is a zip of XML, so without a converter every agent improvises. MarkItDown reads only text, so a scanned page or a picture of a chart still needs the page image.
+
+### 6.5 Codebase Memory
+
+Codebase Memory builds a graph of the repository so the agent can answer structural questions, such as who calls a function, without reading many files.
+
+Turn it on:
+
+| Agent | Command |
+|---|---|
+| Felan | `"codebaseMemory": true` |
+| Claude Code and Codex | `codebase-memory-mcp install -y` |
+
+The installer configures every coding agent it detects, so a Claude Code participant's Codex setup changes too, and the other way round.
+
+**Codex:** open `/hooks` in a new session and trust both Codebase Memory hooks; Codex does not run new hooks until you do:
+
+- Select `SessionStart`, press Enter, and find the entry with `Matcher: startup|resume|clear|compact` and a command ending in `codebase-memory-mcp hook-augment`.
+- Select `SubagentStart`, press Enter, and find the entry with `Matcher: *` and a command ending in `codebase-memory-mcp hook-augment`.
+
+Confirm both entries are checked (`[x]`) and show `Trust: Trusted`. The `PreToolUse` entry with `Matcher: Bash` is the RTK hook, not a Codebase Memory hook.
+
+Check, in a new session:
+
+- **Claude Code:** `/mcp` shows `codebase-memory-mcp` connected, `/hooks` lists `codebase-memory-mcp hook-augment`, `/agents` lists the `codebase-memory` agents, and typing `/codebase-memory` suggests the Codebase Memory skill.
+- **Codex:** `/mcp` shows `codebase-memory-mcp`, and `/skills`, if your Codex version has it, lists `codebase-memory`.
+
+The first time the agent uses Codebase Memory in a repository, it builds the graph. This takes a moment and happens once; afterwards the graph updates automatically when files change.
+
+Exercise: _placeholder — prompt and task to be added._
 
 ## 7. Run the final task with all tools on
 
