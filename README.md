@@ -17,11 +17,17 @@ Participants implement the same feature twice in the Storzy application: first w
 | `materials/workshop-flow.md` | Step-by-step baseline, extension exercises, and enhanced workflow for Felan, Claude Code, and Codex |
 | `materials/implementation-task.md` | Exact feature prompt used for both runs |
 | `materials/manual-verification.md` | Five-check manual validation checklist |
+| `materials/workshop-slides.html` | All theory slides from the workshop in one file. Download it and open it in a browser |
 | `.agents/skills/cost-statistics/` | Cost and quality evaluation skill for Felan and Codex |
 | `.claude/skills/cost-statistics/` | Equivalent skill for Claude Code |
 | `workshop-results/` | Locally generated reports; created when needed and ignored by Git |
 
 The starting application intentionally does not contain the workshop's product-search feature.
+
+## After the workshop
+
+- Slides: download [`materials/workshop-slides.html`](materials/workshop-slides.html) and open it in a browser. Arrow keys, Space, or a click move forward; Shift-click goes back; `#N` in the URL opens slide N.
+- Keep using the tools in your own repositories: [`workshop-flow.md`](materials/workshop-flow.md#use-the-tools-in-your-own-repositories) has the steps for Felan, Claude Code, and Codex.
 
 ## Prerequisites
 

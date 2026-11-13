@@ -514,15 +514,40 @@ Start a fresh evaluator session from the original control repository with the ev
 Use the cost-statistics skill to analyze enhanced session <ENHANCED_SESSION_ID> and compare it with the saved baseline report.
 ```
 
-## After the workshop
+## Use the tools in your own repositories
 
-The configured tools stay active after the workshop. The project-local Manual Prewalk skill remains available but inactive unless invoked. To remove the configured tools:
+RTK, MarkItDown, and Codebase Memory were configured for your user, not for this repository, so they already work in every repository you open with the same agent. Two things are tied to this repository and need a step.
+
+| Tool | What to do in another repository |
+|---|---|
+| RTK | Nothing. The hook rewrites shell commands in every session. Run `rtk gain --history` now and then to see what it saved. |
+| MarkItDown | Nothing. The MCP server is configured for your user. If the agent still unzips an Office file or writes a script to read a PDF, tell it to use the markitdown tool. |
+| Codebase Memory | Send `Index this project` once in each new repository. The graph then updates when files change. On a small repository, measure first: the tool definitions cost context on every call, so the saving can be zero or negative. |
+| Manual Prewalk | The skill lives in this repository only. Copy it once to your user skills folder, then invoke it as in step 7.3 from any repository. |
+| Compaction | No setup. Check the context between phases, compact with a focus that names what must survive, and start a fresh session with a handoff when the phase is done, as in section 6.2. |
+
+Copy Manual Prewalk from the root of this repository:
+
+| Agent | Command |
+|---|---|
+| Claude Code | `mkdir -p ~/.claude/skills && cp -R .claude/skills/manual-prewalk ~/.claude/skills/` |
+| Codex | `mkdir -p ~/.codex/skills && cp -R .agents/skills/manual-prewalk ~/.codex/skills/` |
+
+Start a new session after copying. To share the skill with your team instead, commit the same folder to the team repository: `.claude/skills/manual-prewalk/` for Claude Code, `.agents/skills/manual-prewalk/` for Codex.
+
+To check whether a change saves money on your own work, measure it the way the workshop did. Run one real task once without the change and once with it, from the same starting commit, with the same prompt and model. Compare the cost or usage your agent reports, and check that both results pass the same tests and review.
+
+**Felan:** the four built-in extensions apply to every repository once they are `true` in `~/.felan/settings.json`.
+
+## Remove the tools
+
+The project-local Manual Prewalk skill in this repository stays inactive unless invoked. To remove the configured tools:
 
 | Tool | Claude Code | Codex |
 |---|---|---|
 | RTK | `rtk init -g --uninstall` | `rtk init -g --codex --uninstall` |
 | Codebase Memory | `codebase-memory-mcp uninstall` (all agents) | same |
-| Manual Prewalk | No cleanup. The project-local skill is inactive unless explicitly invoked. | same |
+| Manual Prewalk | No cleanup for the project-local skill. If you copied it, delete `~/.claude/skills/manual-prewalk`. | Delete `~/.codex/skills/manual-prewalk` if you copied it. |
 | MarkItDown | `claude mcp remove --scope user markitdown` | `codex mcp remove markitdown` |
 
 If you started the CBM Lens daemon, stop it first with `codebase-memory-mcp daemon stop`. Codebase Memory's uninstaller can leave its skill folders behind. Check `~/.claude/skills`, `~/.agents/skills`, and `~/.codex/skills` for a `codebase-memory` folder and delete it if present.

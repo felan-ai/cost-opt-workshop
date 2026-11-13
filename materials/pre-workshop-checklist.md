@@ -204,7 +204,7 @@ The baseline runs with none of the optimization tools active. Earlier installs o
 
 - [ ] **Felan:** confirm the four `builtinExtensions` entries are set to `false`.
 
-- [ ] If RTK, Codebase Memory, MarkItDown, or a third-party Prewalk plugin is already configured, remove it with the commands in the "After the workshop" section of [`workshop-flow.md`](workshop-flow.md) and repeat the check. Do not remove the repository's `manual-prewalk` skill; leaving it installed does not affect the baseline because it allows only explicit invocation.
+- [ ] If RTK, Codebase Memory, MarkItDown, or a third-party Prewalk plugin is already configured, remove it with the commands in the "Remove the tools" section of [`workshop-flow.md`](workshop-flow.md#remove-the-tools) and repeat the check. Do not remove the repository's `manual-prewalk` skill; leaving it installed does not affect the baseline because it allows only explicit invocation.
 
 - [ ] Review your personal agent configuration for hooks, plugins, or instructions that compress command output or add code context, such as other token-saving tools. Turn them off for the workshop. Hooks that do not change what the agent sees, such as status or notification hooks, can stay on.
 
